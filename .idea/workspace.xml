@@ -4,7 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e33827a2-95ea-420d-9ce2-5898b2f75b1f" name="Changes" comment="" />
+    <list default="true" id="e33827a2-95ea-420d-9ce2-5898b2f75b1f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/controllers/postController.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/controllers/postController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/models/commentModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/models/commentModel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/models/postModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/models/postModel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/routes/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/routes/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/assets/react.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/index.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,27 +28,28 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
+        <option value="JSX File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "deeplearn009"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;deeplearn009&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/deeplearn009/linkly-proj.git",
-    "accountId": "c642fadd-2464-441c-86fc-5e2a350cd9c1"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/deeplearn009/linkly-proj.git&quot;,
+    &quot;accountId&quot;: &quot;c642fadd-2464-441c-86fc-5e2a350cd9c1&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2yGZxlj8RNvulQCs7QQJN0zpc3Z" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -45,25 +60,25 @@
     <option name="openDirectoriesWithSingleClick" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "javascript.nodejs.core.library.configured.version": "22.14.0",
-    "javascript.nodejs.core.library.typings.version": "22.14.1",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "D:\\WebStorm 2025.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.14.0&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.14.1&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\WebStorm 2025.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -79,6 +94,8 @@
       <option name="presentableId" value="Default" />
       <updated>1749463120396</updated>
       <workItem from="1749463123716" duration="15191000" />
+      <workItem from="1749538117680" duration="16236000" />
+      <workItem from="1749560080014" duration="6604000" />
     </task>
     <servers />
   </component>

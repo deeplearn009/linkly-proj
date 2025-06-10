@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react'
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import RootLayout from "./components/layout/RootLayout.jsx";
+import ErrorPage from "./pages/ErrorPage.jsx";
+import Home from "./pages/Home.jsx";
+import MessagesList from "./components/MessagesList.jsx";
+import Messages from "./pages/Messages.jsx";
+import Bookmarks from "./pages/Bookmarks.jsx";
+import Profile from "./pages/Profile.jsx";
+import SinglePost from "./pages/SinglePost.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import Logout from "./pages/Logout.jsx";
+import {Provider} from "react-redux";
+import store from "./redux/store/store.js";
 
-function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+const router = createBrowserRouter([
+    {
+        path: '/', element: <RootLayout/>, errorElement: <ErrorPage/>, children: [
+            {index: true, element: <Home/>},
+            {path: 'messages', element: <MessagesList/>},
+            {path: 'messages/:receiverId', element: <Messages/>},
+            {path: 'bookmarks', element: <Bookmarks/>},
+            {path: 'users/id', element: <Profile/>},
+            {path: 'posts/:id', element: <SinglePost/>},
+        ]
+    },
+    {path: '/login', element: <Login/>},
+    {path: '/register', element: <Register/>},
+    {path: '/logout', element: <Logout/>},
+])
+
+
+const App = () => {
+    return (
+        <Provider store={store}>
+            <RouterProvider router={router}/>
+        </Provider>
+    )
 }
-
 export default App
