@@ -1,42 +1,69 @@
 import React from 'react'
+import { motion } from 'framer-motion';
+import './FeedSkeleton.css';
 
 const FeedSkeleton = () => {
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.4,
+                ease: "easeOut"
+            }
+        }
+    };
+
     return (
-        <section className={'feedSkeleton'}>
-            <article className={'feedSkeleton__item'}>
-                <header className={'feedSkeleton__item-head'}>
-                    <div></div>
-                </header>
-                <div className={'feedSkeleton__item-body'}></div>
-                <footer className={'feedSkeleton__item-footer'}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </footer>
-            </article>
-            <article className={'feedSkeleton__item'}>
-                <header className={'feedSkeleton__item-head'}>
-                    <div></div>
-                </header>
-                <div className={'feedSkeleton__item-body'}></div>
-                <footer className={'feedSkeleton__item-footer'}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </footer>
-            </article>
-            <article className={'feedSkeleton__item'}>
-                <header className={'feedSkeleton__item-head'}>
-                    <div></div>
-                </header>
-                <div className={'feedSkeleton__item-body'}></div>
-                <footer className={'feedSkeleton__item-footer'}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </footer>
-            </article>
-        </section>
+        <motion.div
+            className="feedSkeleton"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            {[1, 2, 3].map((item) => (
+                <motion.div
+                    key={item}
+                    className="feedSkeleton__item"
+                    variants={itemVariants}
+                >
+                    <div className="feedSkeleton__header">
+                        <div className="feedSkeleton__avatar" />
+                        <div className="feedSkeleton__info">
+                            <div className="feedSkeleton__name" />
+                            <div className="feedSkeleton__time" />
+                        </div>
+                    </div>
+                    <div className="feedSkeleton__content">
+                        <div className="feedSkeleton__text">
+                            <div className="feedSkeleton__text-line" />
+                            <div className="feedSkeleton__text-line" />
+                            <div className="feedSkeleton__text-line" />
+                            <div className="feedSkeleton__text-line" />
+                        </div>
+                        <div className="feedSkeleton__image" />
+                    </div>
+                    <div className="feedSkeleton__footer">
+                        <div className="feedSkeleton__actions">
+                            <div className="feedSkeleton__action" />
+                            <div className="feedSkeleton__action" />
+                        </div>
+                        <div className="feedSkeleton__bookmark" />
+                    </div>
+                </motion.div>
+            ))}
+        </motion.div>
     )
 }
 export default FeedSkeleton

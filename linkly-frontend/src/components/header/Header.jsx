@@ -3,15 +3,13 @@ import {Link, useNavigate} from "react-router-dom";
 import {CiSearch} from "react-icons/ci";
 import ProfileImage from "../ProfileImage.jsx";
 import {useSelector} from "react-redux";
+import { motion } from 'framer-motion';
 
 const Header = () => {
-
     const userId = useSelector(state => state?.user?.currentUser?.id);
     const token = useSelector(state => state?.user?.currentUser?.token);
     const profilePhoto = useSelector(state => state?.user?.currentUser?.profilePhoto);
-
     const navigate = useNavigate();
-
 
     useEffect(() => {
         if(!token){
@@ -19,31 +17,72 @@ const Header = () => {
         }
     }, [])
 
-
     useEffect(() => {
         setTimeout(() => {
             navigate("/logout");
         }, 1000 * 60 * 60)
     }, [])
 
+    const navVariants = {
+        hidden: { y: -100, opacity: 0 },
+        visible: { 
+            y: 0, 
+            opacity: 1,
+            transition: {
+                duration: 0.5,
+                ease: "easeOut"
+            }
+        }
+    };
 
+    const itemVariants = {
+        hidden: { opacity: 0, y: -20 },
+        visible: (i) => ({
+            opacity: 1,
+            y: 0,
+            transition: {
+                delay: i * 0.1,
+                duration: 0.3
+            }
+        })
+    };
 
     return (
-        <nav className="navbar">
+        <motion.nav 
+            className="navbar"
+            initial="hidden"
+            animate="visible"
+            variants={navVariants}
+        >
             <div className="container navbar__container">
-                <Link to={'/'} className={'navbar__logo'}>LINKLY</Link>
-                <form className={'navbar__search'}>
+                <motion.div
+                    custom={0}
+                    variants={itemVariants}
+                >
+                    <Link to={'/'} className={'navbar__logo'}>LINKLY</Link>
+                </motion.div>
+                
+                <motion.form 
+                    className={'navbar__search'}
+                    custom={1}
+                    variants={itemVariants}
+                >
                     <input type="search" placeholder={'Search...'} />
                     <button type={'submit'}><CiSearch/></button>
-                </form>
-                <div className="navbar__right">
+                </motion.form>
+                
+                <motion.div 
+                    className="navbar__right"
+                    custom={2}
+                    variants={itemVariants}
+                >
                     <Link to={`/users/${userId}`} className={'navbar__profile'}>
-                        <ProfileImage image={profilePhoto || "https://res.cloudinary.com/deaqvu2on/image/upload/v1749465286/Sample_User_Icon_qmu5gw.png"}/>
+                        <ProfileImage image={profilePhoto}/>
                     </Link>
                     {token ? <Link to={'/logout'}>Logout</Link> : <Link to={'/login'}>Login</Link>}
-                </div>
+                </motion.div>
             </div>
-        </nav>
+        </motion.nav>
     )
 }
 export default Header

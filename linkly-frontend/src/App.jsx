@@ -13,7 +13,8 @@ import Register from "./pages/Register.jsx";
 import Logout from "./pages/Logout.jsx";
 import {Provider} from "react-redux";
 import store from "./redux/store/store.js";
-
+import { Toaster } from 'react-hot-toast';
+import { AnimatePresence } from 'framer-motion';
 
 const router = createBrowserRouter([
     {
@@ -31,11 +32,28 @@ const router = createBrowserRouter([
     {path: '/logout', element: <Logout/>},
 ])
 
-
 const App = () => {
     return (
         <Provider store={store}>
-            <RouterProvider router={router}/>
+            <AnimatePresence mode="wait">
+                <RouterProvider router={router}/>
+                <Toaster 
+                    position="top-right"
+                    toastOptions={{
+                        duration: 3000,
+                        style: {
+                            background: '#333',
+                            color: '#fff',
+                        },
+                        success: {
+                            duration: 3000,
+                            theme: {
+                                primary: '#4aed88',
+                            },
+                        },
+                    }}
+                />
+            </AnimatePresence>
         </Provider>
     )
 }
