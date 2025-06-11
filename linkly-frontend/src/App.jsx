@@ -22,7 +22,7 @@ const router = createBrowserRouter([
             {path: 'messages', element: <MessagesList/>},
             {path: 'messages/:receiverId', element: <Messages/>},
             {path: 'bookmarks', element: <Bookmarks/>},
-            {path: 'users/id', element: <Profile/>},
+            {path: 'users/:id', element: <Profile/>},
             {path: 'posts/:id', element: <SinglePost/>},
         ]
     },

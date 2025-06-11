@@ -190,7 +190,7 @@ button {
 }
 
 .profileImage {
-    width: 100px;
+    width: 38px;
     aspect-ratio: 1/1;
     border-radius: 50%;
     overflow: hidden;
@@ -319,7 +319,7 @@ NAVBAR
 }
 
 .navbar__logo {
-    font-size: 1rem;
+    font-size: 28px;
     font-weight: 600;
     color: var(--color-gray-900);
 }

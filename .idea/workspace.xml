@@ -5,19 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e33827a2-95ea-420d-9ce2-5898b2f75b1f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-backend/controllers/postController.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/controllers/postController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-backend/models/commentModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/models/commentModel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-backend/models/postModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/models/postModel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-backend/routes/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/routes/routes.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/models/userModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/models/userModel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/linkly-frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/assets/react.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/ProfileImage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/ProfileImage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/Sidebar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/header/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/header/Header.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/layout/RootLayout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/layout/RootLayout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/linkly-frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Bookmarks.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Bookmarks.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Home.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Logout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Logout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/SinglePost.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/SinglePost.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,8 +26,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="JSX File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -95,7 +94,10 @@
       <updated>1749463120396</updated>
       <workItem from="1749463123716" duration="15191000" />
       <workItem from="1749538117680" duration="16236000" />
-      <workItem from="1749560080014" duration="6604000" />
+      <workItem from="1749560080014" duration="6947000" />
+      <workItem from="1749640659946" duration="7520000" />
+      <workItem from="1749648969687" duration="6473000" />
+      <workItem from="1749655977949" duration="2774000" />
     </task>
     <servers />
   </component>
