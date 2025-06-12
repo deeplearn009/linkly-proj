@@ -1630,6 +1630,7 @@ MEDIA QUERIES (small screens)
         gap: 1.5rem;
         box-shadow: 0 -1rem 2rem rgba(0, 0, 0, 0.15);
         align-items: center;
+        z-index: 9999;
     }
 
     .sidebar p {

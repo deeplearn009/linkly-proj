@@ -36,43 +36,30 @@ const Messages = () => {
 
     const getMessages = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/messages/${receiverId}`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${receiverId}`, {
                 withCredentials: true,
                 headers: {Authorization: `Bearer ${token}`}
-            });
-            if (Array.isArray(response?.data)) {
-                setMessages(response.data);
-                if (response.data.length > 0) {
-                    setConversationId(response.data[0]?.conversationId);
-                }
-            } else {
-                setMessages([]);
-            }
+            })
+            setMessages(response?.data)
+            setConversationId(response?.data?.[0]?.conversationId)
         } catch (err) {
-            console.error('Error fetching messages:', err);
-            setMessages([]);
+            console.error(err)
         }
     }
 
     const socket = useSelector(state => state?.user?.socket)
 
     const sendMessage = async (e) => {
-        e.preventDefault();
-        if (!messageBody.trim()) return;
-        
+        e.preventDefault()
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/messages/${receiverId}`,
-                { messageBody },
-                {
-                    withCredentials: true,
-                    headers: {Authorization: `Bearer ${token}`}
-                }
-            );
-            setMessages(prevMessages => [...prevMessages, response?.data]);
-            setMessageBody("");
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/messages/${receiverId}`, {
+                withCredentials: true,
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            setMessages(prevMessages => [...prevMessages, response?.data])
+            setMessageBody("")
         } catch (err) {
-            console.error('Error sending message:', err);
+            console.error(err)
         }
     }
 
@@ -80,25 +67,18 @@ const Messages = () => {
     const conversations = useSelector(state => state?.user?.conversations)
 
     useEffect(() => {
-        if (socket) {
-            socket.on("newMessage", message => {
-                setMessages(prevMessages => [...prevMessages, message]);
+        socket?.on("newMessage", message => {
+            setMessages(prevMessages => [...prevMessages, message])
 
-                dispatch(userActions?.setConversations(conversations.map(conversation => {
-                    if (conversation?._id === conversationId) {
-                        return {...conversation, lastMessage: {...conversation.lastMessage, seen: true}};
-                    }
-                    return conversation;
-                })));
-            });
-        }
+            dispatch(userActions?.setConversations(conversations.map(conversation => {
+                if(conversation?._id == conversationId) {
+                    return {...conversation, lastMessage: {...conversation.lastMessage, seen: true}};
+                }
+            })))
 
-        return () => {
-            if (socket) {
-                socket.off("newMessage");
-            }
-        };
-    }, [socket, conversationId, conversations, dispatch]);
+            return () => socket.off("newMessage")
+        })
+    }, [socket, messages]);
 
     useEffect(() => {
         getMessages()

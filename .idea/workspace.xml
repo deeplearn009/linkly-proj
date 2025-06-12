@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e33827a2-95ea-420d-9ce2-5898b2f75b1f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-backend/controllers/userController.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/controllers/userController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/BookmarkPost.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/BookmarkPost.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/EditProfileModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/EditProfileModal.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/MessagesList.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/MessagesList.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/UserProfile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/UserProfile.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/Widgets.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/Widgets.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Messages.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Messages.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Profile.jsx" afterDir="false" />
-    </list>
+    <list default="true" id="e33827a2-95ea-420d-9ce2-5898b2f75b1f" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -100,6 +90,7 @@
       <workItem from="1749732473090" duration="764000" />
       <workItem from="1749751846570" duration="3400000" />
       <workItem from="1749755779527" duration="2161000" />
+      <workItem from="1749759237018" duration="141000" />
     </task>
     <servers />
   </component>
