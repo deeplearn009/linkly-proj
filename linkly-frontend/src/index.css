@@ -316,15 +316,20 @@ NAVBAR
     top: 0;
     left: 0;
     width: 100vw;
-    /* box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.1); */
     border-bottom: 0.2rem solid var(--color-gray-100);
     z-index: 3;
+}
+
+.dark .navbar {
+    background: #1a1a1a;
+    border-bottom-color: #333;
 }
 
 .navbar__container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: var(--container-w-lg);
 }
 
 .navbar__left {
@@ -339,6 +344,10 @@ NAVBAR
     color: var(--color-gray-900);
 }
 
+.dark .navbar__logo {
+    color: #fff;
+}
+
 .navbar__search {
     background: var(--color-gray-100);
     padding: 0.6rem 1rem;
@@ -350,10 +359,27 @@ NAVBAR
     gap: 1rem;
 }
 
+.dark .navbar__search {
+    background: #2a2a2a;
+    border: 1px solid #333;
+}
+
 .navbar__search input {
     background: transparent;
     width: 100%;
     color: var(--color-gray-900);
+}
+
+.dark .navbar__search input {
+    color: #fff;
+}
+
+.navbar__search input::placeholder {
+    color: var(--color-text-light);
+}
+
+.dark .navbar__search input::placeholder {
+    color: #666;
 }
 
 .navbar__search button {
@@ -365,6 +391,10 @@ NAVBAR
     display: grid;
     place-items: center;
     transition: var(--transition);
+}
+
+.dark .navbar__search button {
+    color: #fff;
 }
 
 .navbar__search button:hover {
@@ -388,9 +418,128 @@ NAVBAR
     justify-content: center;
 }
 
+.dark .navbar__right .theme-toggle {
+    color: #fff;
+}
+
 .navbar__right .theme-toggle:hover {
     color: var(--color-primary);
     transform: scale(1.1);
+}
+
+/* Search Results Dropdown Styles */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dark .search-results {
+    background: #1a1a1a;
+    border-color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background-color 0.2s ease;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.dark .search-result-item {
+    background: #1a1a1a;
+    border-bottom-color: #333;
+    color: #fff;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: var(--color-bg-hover);
+}
+
+.dark .search-result-item:hover {
+    background-color: #2a2a2a;
+}
+
+.search-result-info {
+    flex: 1;
+}
+
+.search-result-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.dark .search-result-info h4 {
+    color: #fff;
+}
+
+.search-result-info small {
+    color: var(--color-text-light);
+    font-size: 0.8rem;
+}
+
+.dark .search-result-info small {
+    color: #666;
+}
+
+/* Custom scrollbar for search results */
+.search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: var(--color-bg);
+}
+
+.dark .search-results::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+}
+
+.dark .search-results::-webkit-scrollbar-thumb {
+    background: #333;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-light);
+}
+
+.dark .search-results::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .navbar__container {
+        width: var(--container-w-sm);
+    }
+
+    .navbar__search {
+        width: 100%;
+    }
 }
 
 
@@ -1899,18 +2048,6 @@ MEDIA QUERIES (small screens)
 }
 
 /* Header Styles */
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
 .navbar__logo {
     display: flex;
     align-items: center;
@@ -1947,70 +2084,34 @@ MEDIA QUERIES (small screens)
     transition: all 0.3s ease;
 }
 
-/* Search Results Dropdown Styles */
-.search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    margin-top: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.search-result-item {
+.navbar__actions {
     display: flex;
     align-items: center;
-    padding: 0.75rem;
-    text-decoration: none;
+    gap: 1rem;
+}
+
+.navbar__action {
+    background: transparent;
+    border: none;
     color: var(--color-text);
-    transition: background-color 0.2s ease;
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
-.search-result-item:last-child {
-    border-bottom: none;
+.navbar__action:hover {
+    color: var(--color-primary);
 }
 
-.search-result-item:hover {
-    background-color: var(--color-bg-hover);
+.navbar__action.active {
+    color: var(--color-primary);
 }
 
-.search-result-info {
-    flex: 1;
-}
-
-.search-result-info h4 {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--color-text);
-}
-
-.search-result-info small {
-    color: var(--color-text-light);
-    font-size: 0.8rem;
-}
-
-/* Custom scrollbar for search results */
-.search-results::-webkit-scrollbar {
-    width: 6px;
-}
-
-.search-results::-webkit-scrollbar-track {
-    background: var(--color-bg);
-}
-
-.search-results::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 3px;
-}
-
-.search-results::-webkit-scrollbar-thumb:hover {
-    background: var(--color-text-light);
+.navbar__action svg {
+    width: 24px;
+    height: 24px;
 }

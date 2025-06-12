@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {uiSliceActions} from "../../redux/ui-slice";
 import axios from "axios";
 import { FaSearch, FaHome, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { userActions } from '../../redux/user-slice';
 
 const Header = () => {
     const userId = useSelector(state => state?.user?.currentUser?.id);
@@ -56,12 +57,15 @@ const Header = () => {
     };
 
     const handleLogout = () => {
-        dispatch(uiSliceActions.logout());
+        dispatch(userActions.changeCurrentUser({}));
+        localStorage.setItem("currentUser", null);
         navigate('/login');
     };
 
     const toggleTheme = () => {
-        dispatch(uiSliceActions.toggleTheme());
+        const newBackgroundColor = theme.backgroundColor === "dark" ? "" : "dark";
+        dispatch(uiSliceActions.changeTheme({...theme, backgroundColor: newBackgroundColor}));
+        localStorage.setItem("theme", JSON.stringify({...theme, backgroundColor: newBackgroundColor}));
     };
 
     const navVariants = {
