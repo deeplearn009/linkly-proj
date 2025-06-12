@@ -62,21 +62,16 @@ const loginUser = async (req, res, next) => {
         }
 
         // email lowercase
-
         const lowerCaseEmail = email.toLowerCase();
 
         //fetching user from db
-
         const user = await UserModel.findOne({email: lowerCaseEmail})
 
         if (!user) {
             return next(new HttpError('Invalid credentials', 422));
         }
 
-        // const {uPassword, ...userInfo} = user;
-
         //compare passwd
-
         const comparedPassword = await bcrypt.compare(password, user?.password);
 
         if (!comparedPassword) {
@@ -84,7 +79,13 @@ const loginUser = async (req, res, next) => {
         }
 
         const token = await jwt.sign({id: user?._id}, `${process.env.JWT_SECRET}`, {expiresIn: '1h'});
-        res.json({token, id: user?._id}).status(200);
+        res.json({
+            token, 
+            id: user?._id,
+            fullName: user?.fullName,
+            email: user?.email,
+            profilePhoto: user?.profilePhoto
+        }).status(200);
 
     } catch (err) {
         return next(new HttpError(err));

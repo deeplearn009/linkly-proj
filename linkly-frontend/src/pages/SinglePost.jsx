@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import ProfileImage from "../components/ProfileImage.jsx";
 import axios from "axios";
 import {useSelector} from "react-redux";
@@ -7,11 +7,12 @@ import TimeAgo from "react-timeago";
 import LikeDislikePost from "../components/LikeDislikePost.jsx";
 import {FaRegCommentDots} from "react-icons/fa";
 import {IoMdSend, IoMdShare} from "react-icons/io";
+import {IoArrowBack} from "react-icons/io5";
 import BookmarkPost from "../components/BookmarkPost.jsx";
 import PostComment from "../components/PostComment.jsx";
 
 const SinglePost = () => {
-
+    const navigate = useNavigate();
     let {id} = useParams()
     const [post, setPost] = useState({})
     const [comments, setComments] = useState([])
@@ -65,12 +66,15 @@ const SinglePost = () => {
 
     return (
         <section className="singlePost">
+            <button className="singlePost__back-btn" onClick={() => navigate(-1)}>
+                <IoArrowBack />
+            </button>
             <header className={'feed__header'}>
-                <ProfileImage image={post?.creator?.profilePhoto}/>
-                <div className="feed__header-details">
+                <div className="feed__header-user">
+                    <ProfileImage image={post?.creator?.profilePhoto}/>
                     <h4>{post?.creator?.fullName}</h4>
-                    <small><TimeAgo date={post?.createdAt}/></small>
                 </div>
+                <small><TimeAgo date={post?.createdAt}/></small>
             </header>
             <div className="feed__body">
                 <p>{post?.body}</p>

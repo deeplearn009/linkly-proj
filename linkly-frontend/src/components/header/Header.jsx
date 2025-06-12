@@ -1,27 +1,39 @@
 import React, {useEffect} from 'react'
 import {Link, useNavigate} from "react-router-dom";
 import {CiSearch} from "react-icons/ci";
+import {MdOutlineDarkMode, MdOutlineLightMode} from "react-icons/md";
 import ProfileImage from "../ProfileImage.jsx";
-import {useSelector} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import { motion } from 'framer-motion';
+import {uiSliceActions} from "../../redux/ui-slice.js";
 
 const Header = () => {
-    const userId = useSelector(state => state?.user?.currentUser?.id);
-    const token = useSelector(state => state?.user?.currentUser?.token);
-    const profilePhoto = useSelector(state => state?.user?.currentUser?.profilePhoto);
+    const currentUser = useSelector(state => state?.user?.currentUser);
+    const token = currentUser?.token;
+    const profilePhoto = currentUser?.profilePhoto;
+    const theme = useSelector(state => state?.ui?.theme);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
         if(!token){
             navigate("/login");
         }
-    }, [])
+    }, [token, navigate])
 
     useEffect(() => {
-        setTimeout(() => {
-            navigate("/logout");
-        }, 1000 * 60 * 60)
-    }, [])
+        if(token) {
+            setTimeout(() => {
+                navigate("/logout");
+            }, 1000 * 60 * 60)
+        }
+    }, [token, navigate])
+
+    const toggleTheme = () => {
+        const newBackgroundColor = theme.backgroundColor === "dark" ? "" : "dark";
+        dispatch(uiSliceActions.changeTheme({...theme, backgroundColor: newBackgroundColor}));
+        localStorage.setItem("theme", JSON.stringify({...theme, backgroundColor: newBackgroundColor}));
+    };
 
     const navVariants = {
         hidden: { y: -100, opacity: 0 },
@@ -76,9 +88,18 @@ const Header = () => {
                     custom={2}
                     variants={itemVariants}
                 >
-                    <Link to={`/users/${userId}`} className={'navbar__profile'}>
-                        <ProfileImage image={profilePhoto}/>
-                    </Link>
+                    <button 
+                        className="theme-toggle"
+                        onClick={toggleTheme}
+                        aria-label="Toggle theme"
+                    >
+                        {theme.backgroundColor === "dark" ? <MdOutlineLightMode /> : <MdOutlineDarkMode />}
+                    </button>
+                    {currentUser && (
+                        <Link to={`/users/${currentUser.id}`} className={'navbar__profile'}>
+                            <ProfileImage image={profilePhoto} />
+                        </Link>
+                    )}
                     {token ? <Link to={'/logout'}>Logout</Link> : <Link to={'/login'}>Login</Link>}
                 </motion.div>
             </div>

@@ -1,8 +1,12 @@
 import React from 'react'
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
 import './FeedSkeleton.css';
 
 const FeedSkeleton = () => {
+    const theme = useSelector(state => state?.ui?.theme);
+    const isDarkMode = theme?.backgroundColor === "dark";
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -27,7 +31,7 @@ const FeedSkeleton = () => {
 
     return (
         <motion.div
-            className="feedSkeleton"
+            className={`feedSkeleton ${isDarkMode ? 'dark' : ''}`}
             variants={containerVariants}
             initial="hidden"
             animate="visible"

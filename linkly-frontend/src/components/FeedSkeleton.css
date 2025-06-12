@@ -16,9 +16,19 @@
     transition: all 0.3s ease;
 }
 
+.feedSkeleton.dark .feedSkeleton__item {
+    background: #1a1a1a;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
 .feedSkeleton__item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.feedSkeleton.dark .feedSkeleton__item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .feedSkeleton__header {
@@ -36,6 +46,10 @@
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease;
+}
+
+.feedSkeleton.dark .feedSkeleton__avatar {
+    background: #2a2a2a;
 }
 
 .feedSkeleton__avatar:hover {
@@ -58,6 +72,15 @@
     animation: shimmer 1.5s infinite;
 }
 
+.feedSkeleton.dark .feedSkeleton__avatar::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+}
+
 .feedSkeleton__info {
     flex: 1;
 }
@@ -70,6 +93,10 @@
     margin-bottom: 0.5rem;
     position: relative;
     overflow: hidden;
+}
+
+.feedSkeleton.dark .feedSkeleton__name {
+    background: #2a2a2a;
 }
 
 .feedSkeleton__name::after {
@@ -88,6 +115,15 @@
     animation: shimmer 1.5s infinite;
 }
 
+.feedSkeleton.dark .feedSkeleton__name::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+}
+
 .feedSkeleton__time {
     height: 12px;
     width: 80px;
@@ -95,6 +131,10 @@
     border-radius: 4px;
     position: relative;
     overflow: hidden;
+}
+
+.feedSkeleton.dark .feedSkeleton__time {
+    background: #2a2a2a;
 }
 
 .feedSkeleton__time::after {
@@ -111,6 +151,15 @@
         transparent
     );
     animation: shimmer 1.5s infinite;
+}
+
+.feedSkeleton.dark .feedSkeleton__time::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
 }
 
 .feedSkeleton__content {
@@ -130,6 +179,10 @@
     border-radius: 4px;
     position: relative;
     overflow: hidden;
+}
+
+.feedSkeleton.dark .feedSkeleton__text-line {
+    background: #2a2a2a;
 }
 
 .feedSkeleton__text-line:nth-child(1) {
@@ -164,6 +217,15 @@
     animation: shimmer 1.5s infinite;
 }
 
+.feedSkeleton.dark .feedSkeleton__text-line::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+}
+
 .feedSkeleton__image {
     height: 300px;
     background: #f0f0f0;
@@ -171,6 +233,10 @@
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease;
+}
+
+.feedSkeleton.dark .feedSkeleton__image {
+    background: #2a2a2a;
 }
 
 .feedSkeleton__image:hover {
@@ -193,12 +259,25 @@
     animation: shimmer 1.5s infinite;
 }
 
+.feedSkeleton.dark .feedSkeleton__image::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+}
+
 .feedSkeleton__footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-top: 1rem;
     border-top: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.feedSkeleton.dark .feedSkeleton__footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .feedSkeleton__actions {
@@ -214,6 +293,10 @@
     position: relative;
     overflow: hidden;
     transition: transform 0.2s ease;
+}
+
+.feedSkeleton.dark .feedSkeleton__action {
+    background: #2a2a2a;
 }
 
 .feedSkeleton__action:hover {
@@ -236,6 +319,15 @@
     animation: shimmer 1.5s infinite;
 }
 
+.feedSkeleton.dark .feedSkeleton__action::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+}
+
 .feedSkeleton__bookmark {
     width: 24px;
     height: 24px;
@@ -244,6 +336,10 @@
     position: relative;
     overflow: hidden;
     transition: transform 0.2s ease;
+}
+
+.feedSkeleton.dark .feedSkeleton__bookmark {
+    background: #2a2a2a;
 }
 
 .feedSkeleton__bookmark:hover {
@@ -266,6 +362,15 @@
     animation: shimmer 1.5s infinite;
 }
 
+.feedSkeleton.dark .feedSkeleton__bookmark::after {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+}
+
 @keyframes shimmer {
     0% {
         transform: translateX(-100%);
@@ -277,9 +382,12 @@
 
 @keyframes loading {
     0% {
-        background-position: 0% 0%;
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
     }
     100% {
-        background-position: 200% 0%;
+        opacity: 0.6;
     }
 } 

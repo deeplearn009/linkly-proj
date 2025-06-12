@@ -4,10 +4,12 @@ import {useSelector} from "react-redux";
 import {SlPicture} from "react-icons/sl";
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { IoClose } from "react-icons/io5";
 
 const CreatePost = ({onCreatePost, error}) => {
     const [body, setBody] = useState('');
     const [image, setImage] = useState('');
+    const [imagePreview, setImagePreview] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const profilePhoto = useSelector(state => state?.user?.currentUser?.profilePhoto);
 
@@ -28,12 +30,30 @@ const CreatePost = ({onCreatePost, error}) => {
             toast.success('Post created successfully!');
             setBody('');
             setImage('');
+            setImagePreview('');
         } catch (err) {
             toast.error('Failed to create post');
         } finally {
             setIsSubmitting(false);
         }
     }
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const removeImage = () => {
+        setImage('');
+        setImagePreview('');
+    };
 
     const containerVariants = {
         hidden: { opacity: 0, y: -20 },
@@ -95,6 +115,29 @@ const CreatePost = ({onCreatePost, error}) => {
                 />
             </motion.div>
             
+            <AnimatePresence>
+                {imagePreview && (
+                    <motion.div 
+                        className="createPost__image-preview"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        variants={itemVariants}
+                    >
+                        <img src={imagePreview} alt="Preview" />
+                        <motion.button 
+                            type="button"
+                            className="createPost__remove-image"
+                            onClick={removeImage}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                        >
+                            <IoClose />
+                        </motion.button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            
             <motion.div 
                 className="createPost__bottom"
                 variants={itemVariants}
@@ -113,7 +156,12 @@ const CreatePost = ({onCreatePost, error}) => {
                 >
                     <SlPicture/>
                 </motion.label>
-                <input type="file" id={'image'} onChange={e => setImage(e.target.files[0])}/>
+                <input 
+                    type="file" 
+                    id={'image'} 
+                    onChange={handleImageChange}
+                    accept="image/*"
+                />
                 <motion.button 
                     type="submit"
                     whileHover={{ scale: 1.05 }}

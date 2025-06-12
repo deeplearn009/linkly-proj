@@ -14,15 +14,17 @@ const PostComment = ({comment, onDeleteComment}) => {
 
     return (
         <li className="singlePost__comment">
-            <div className="singlepost__comment-wrapper">
-                <div className="singlePost__comment-author">
-                    <img src={comment?.creator?.creatorPhoto} alt=""/>
-                </div>
-                <div className="singlePost__comment-body">
-                    <div>
+            <div className="singlePost__comment-content">
+                <div className="singlepost__comment-wrapper">
+                    <div className="singlePost__comment-author">
+                        <img src={comment?.creator?.creatorPhoto} alt=""/>
+                    </div>
+                    <div className="singlePost__comment-header">
                         <h5>{comment?.creator?.creatorName}</h5>
                         <small><TimeAgo date={comment?.createdAt}/></small>
                     </div>
+                </div>
+                <div className="singlePost__comment-body">
                     <p>{comment?.comment}</p>
                 </div>
             </div>
