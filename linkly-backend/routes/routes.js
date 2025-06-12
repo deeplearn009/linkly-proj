@@ -1,4 +1,5 @@
-const router = require("express").Router();
+const express = require('express')
+const router = express.Router()
 const authMiddleware = require('../middleware/authMiddleware')
 
 const {
@@ -11,7 +12,8 @@ const {
     followUnfollowUser,
     getFollowers,
     getFollowing,
-    removeFollower
+    removeFollower,
+    searchUsers
 } = require('../controllers/userController')
 
 const {
@@ -49,6 +51,7 @@ router.get('/users/:id/likes', authMiddleware, getUserLikedPosts)
 router.get('/users/:id/followers', authMiddleware, getFollowers)
 router.get('/users/:id/following', authMiddleware, getFollowing)
 router.delete('/users/:id/remove-follower', authMiddleware, removeFollower)
+router.get('/search/users', authMiddleware, searchUsers)
 
 
 // Post routes

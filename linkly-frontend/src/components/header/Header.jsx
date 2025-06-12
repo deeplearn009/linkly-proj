@@ -1,58 +1,67 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {Link, useNavigate} from "react-router-dom";
 import {CiSearch} from "react-icons/ci";
 import {MdOutlineDarkMode, MdOutlineLightMode} from "react-icons/md";
-import ProfileImage from "../ProfileImage.jsx";
+import ProfileImage from "../ProfileImage";
 import {useSelector, useDispatch} from "react-redux";
-import { motion } from 'framer-motion';
-import {uiSliceActions} from "../../redux/ui-slice.js";
+import { motion, AnimatePresence } from 'framer-motion';
+import {uiSliceActions} from "../../redux/ui-slice";
 import axios from "axios";
+import { FaSearch, FaHome, FaUser, FaSignOutAlt } from 'react-icons/fa';
 
 const Header = () => {
-    const [user, setuser] = useState({})
-    const userId = useSelector(state => state?.user?.currentUser?.id)
+    const userId = useSelector(state => state?.user?.currentUser?.id);
     const currentUser = useSelector(state => state?.user?.currentUser);
     const token = currentUser?.token;
-    // const profilePhoto = currentUser?.profilePhoto;
     const theme = useSelector(state => state?.ui?.theme);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const searchRef = useRef(null);
 
-    const getUser = async () => {
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setSearchResults([]);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleSearch = async (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+
+        if (!query.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
+            setIsSearching(true);
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/search/users?query=${query}`, {
                 withCredentials: true,
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            setuser(response?.data)
-        } catch (err) {
-            console.error(err)
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSearchResults(response.data);
+        } catch (error) {
+            console.error('Error searching users:', error);
+        } finally {
+            setIsSearching(false);
         }
-    }
+    };
 
-    useEffect(() => {
-        getUser()
-    }, [])
-
-
-    useEffect(() => {
-        if(!token){
-            navigate("/login");
-        }
-    }, [token, navigate])
-
-    useEffect(() => {
-        if(token) {
-            setTimeout(() => {
-                navigate("/logout");
-            }, 1000 * 60 * 60)
-        }
-    }, [token, navigate])
+    const handleLogout = () => {
+        dispatch(uiSliceActions.logout());
+        navigate('/login');
+    };
 
     const toggleTheme = () => {
-        const newBackgroundColor = theme.backgroundColor === "dark" ? "" : "dark";
-        dispatch(uiSliceActions.changeTheme({...theme, backgroundColor: newBackgroundColor}));
-        localStorage.setItem("theme", JSON.stringify({...theme, backgroundColor: newBackgroundColor}));
+        dispatch(uiSliceActions.toggleTheme());
     };
 
     const navVariants = {
@@ -94,14 +103,47 @@ const Header = () => {
                     <Link to={'/'} className={'navbar__logo'}>LINKLY</Link>
                 </motion.div>
                 
-                <motion.form 
-                    className={'navbar__search'}
+                <motion.div 
+                    className={'navbar__search-container'}
                     custom={1}
                     variants={itemVariants}
                 >
-                    <input type="search" placeholder={'Search...'} />
-                    <button type={'submit'}><CiSearch/></button>
-                </motion.form>
+                    <form className={'navbar__search'} onSubmit={handleSearch}>
+                        <input 
+                            type="search" 
+                            placeholder={'Search users...'} 
+                            value={searchQuery}
+                            onChange={handleSearch}
+                        />
+                        <button type={'submit'}><CiSearch/></button>
+                    </form>
+                    <AnimatePresence>
+                        {searchResults.length > 0 && (
+                            <motion.div 
+                                className="search-results"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {searchResults.map((result) => (
+                                    <Link
+                                        key={result._id}
+                                        to={`/users/${result._id}`}
+                                        className="search-result-item"
+                                        onClick={() => setSearchResults([])}
+                                    >
+                                        <ProfileImage image={result.profilePhoto} />
+                                        <div className="search-result-info">
+                                            <h4>{result.fullName}</h4>
+                                            <small>{result.email}</small>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
                 
                 <motion.div 
                     className="navbar__right"
@@ -117,13 +159,22 @@ const Header = () => {
                     </button>
                     {currentUser && (
                         <Link to={`/users/${currentUser.id}`} className={'navbar__profile'}>
-                            <ProfileImage image={user?.profilePhoto} />
+                            <ProfileImage image={currentUser?.profilePhoto} />
                         </Link>
                     )}
-                    {token ? <Link to={'/logout'}>Logout</Link> : <Link to={'/login'}>Login</Link>}
+                    {token ? (
+                        <button onClick={handleLogout} className="navbar__action">
+                            <FaSignOutAlt />
+                        </button>
+                    ) : (
+                        <Link to="/login" className="navbar__action">
+                            Login
+                        </Link>
+                    )}
                 </motion.div>
             </div>
         </motion.nav>
     )
 }
-export default Header
+
+export default Header;
