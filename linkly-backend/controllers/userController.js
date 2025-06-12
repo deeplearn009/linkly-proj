@@ -96,13 +96,12 @@ const loginUser = async (req, res, next) => {
 const getUser = async (req, res, next) => {
     try {
         const {id} = req.params;
-        const user = await UserModel.findById(id)
-        res.json(user).status(200)
+        const user = await UserModel.findById(id).select("-password")
 
         if (!user) {
             return next(new HttpError('User notfound', 422));
         }
-
+        res.json(user).status(200)
     } catch (err) {
         return next(new HttpError(err));
     }

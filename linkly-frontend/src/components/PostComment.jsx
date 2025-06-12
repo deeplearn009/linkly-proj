@@ -1,16 +1,19 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {useSelector} from "react-redux";
 import TimeAgo from "react-timeago";
 import {FaRegTrashAlt} from "react-icons/fa";
+import axios from "axios";
 
 const PostComment = ({comment, onDeleteComment}) => {
-
     const token = useSelector(state => state?.user?.currentUser?.token)
     const userId = useSelector(state => state?.user?.currentUser?.id)
+
+
 
     const deleteComment = () => {
         onDeleteComment(comment?._id)
     }
+
 
     return (
         <li className="singlePost__comment">

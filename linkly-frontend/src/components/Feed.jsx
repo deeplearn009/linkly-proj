@@ -1,23 +1,26 @@
 import React, {useEffect, useState} from 'react'
 import axios from "axios";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {Link, useLocation} from "react-router-dom";
 import ProfileImage from "./ProfileImage.jsx";
 import TimeAgo from "react-timeago";
 import {FaRegCommentDots} from "react-icons/fa";
 import {IoMdShare} from "react-icons/io";
+import {IoEllipsisHorizontal} from "react-icons/io5";
 import LikeDislikePost from "./LikeDislikePost.jsx";
 import TrimText from "../helpers/TrimText.jsx";
 import BookmarkPost from "./BookmarkPost.jsx";
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import {uiSliceActions} from "../redux/ui-slice.js";
 
-const Feed = ({post}) => {
+const Feed = ({post, onDeletePost}) => {
 
     const [creator, setCreator] = useState({})
     const token = useSelector(state => state?.user?.currentUser?.token)
     const userId = useSelector(state => state?.user?.currentUser?.id)
     const [showFeedHeaderMenu, setShowFeedHeaderMenu] = useState(false);
+    const dispatch = useDispatch();
 
     const location = useLocation();
 
@@ -37,6 +40,20 @@ const Feed = ({post}) => {
     useEffect(() => {
         getPostCreator()
     }, [])
+
+    const closeFeedHeaderMenu = () => {
+        setShowFeedHeaderMenu(false);
+    }
+
+    const showEditPostModal = () => {
+        dispatch(uiSliceActions?.openEditPostModal(post?._id))
+        closeFeedHeaderMenu()
+    }
+
+    const deletePost = () => {
+        onDeletePost(post?._id)
+        closeFeedHeaderMenu()
+    }
 
     const handleShare = () => {
         navigator.clipboard.writeText(`${window.location.origin}/posts/${post?._id}`);
@@ -94,23 +111,33 @@ const Feed = ({post}) => {
                         <small><TimeAgo date={post?.createdAt}/></small>
                     </div>
                 </Link>
+                {userId == post?.creator && (
+                    <motion.button 
+                        className="feed__header-menu-trigger"
+                        onClick={() => setShowFeedHeaderMenu(!showFeedHeaderMenu)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                    >
+                        <IoEllipsisHorizontal />
+                    </motion.button>
+                )}
                 <AnimatePresence>
                     {showFeedHeaderMenu && userId == post?.creator && location.pathname.includes("users") && (
-                        <motion.menu 
+                        <motion.menu
                             className={'feed__header-menu'}
                             variants={menuVariants}
                             initial="hidden"
                             animate="visible"
                             exit="exit"
                         >
-                            <motion.button 
+                            <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={showEditPostModal}
                             >
                                 Edit
                             </motion.button>
-                            <motion.button 
+                            <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={deletePost}

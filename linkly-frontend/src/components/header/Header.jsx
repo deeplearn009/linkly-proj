@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Link, useNavigate} from "react-router-dom";
 import {CiSearch} from "react-icons/ci";
 import {MdOutlineDarkMode, MdOutlineLightMode} from "react-icons/md";
@@ -6,14 +6,34 @@ import ProfileImage from "../ProfileImage.jsx";
 import {useSelector, useDispatch} from "react-redux";
 import { motion } from 'framer-motion';
 import {uiSliceActions} from "../../redux/ui-slice.js";
+import axios from "axios";
 
 const Header = () => {
+    const [user, setuser] = useState({})
+    const userId = useSelector(state => state?.user?.currentUser?.id)
     const currentUser = useSelector(state => state?.user?.currentUser);
     const token = currentUser?.token;
-    const profilePhoto = currentUser?.profilePhoto;
+    // const profilePhoto = currentUser?.profilePhoto;
     const theme = useSelector(state => state?.ui?.theme);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const getUser = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
+                withCredentials: true,
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            setuser(response?.data)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    useEffect(() => {
+        getUser()
+    }, [])
+
 
     useEffect(() => {
         if(!token){
@@ -97,7 +117,7 @@ const Header = () => {
                     </button>
                     {currentUser && (
                         <Link to={`/users/${currentUser.id}`} className={'navbar__profile'}>
-                            <ProfileImage image={profilePhoto} />
+                            <ProfileImage image={user?.profilePhoto} />
                         </Link>
                     )}
                     {token ? <Link to={'/logout'}>Logout</Link> : <Link to={'/login'}>Login</Link>}

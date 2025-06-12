@@ -10,6 +10,7 @@ import {IoMdSend, IoMdShare} from "react-icons/io";
 import {IoArrowBack} from "react-icons/io5";
 import BookmarkPost from "../components/BookmarkPost.jsx";
 import PostComment from "../components/PostComment.jsx";
+import toast from 'react-hot-toast';
 
 const SinglePost = () => {
     const navigate = useNavigate();
@@ -46,16 +47,25 @@ const SinglePost = () => {
         }
     }
 
-    const createComment = async () => {
+    const createComment = async (e) => {
+        e.preventDefault();
+        if (!comment.trim()) {
+            toast.error('Please enter a comment');
+            return;
+        }
+        
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/comments/${id}`, {comment}, {
                 withCredentials: true,
                 headers: {Authorization: `Bearer ${token}`}
             })
-            const newComment = response?.data
-            setComments([newComment, ...comments])
+            const newComment = response?.data;
+            setComments([newComment, ...comments]);
+            setComment(''); // Clear the comment input
+            toast.success('Comment added successfully!');
         } catch (err) {
-            console.error(err)
+            console.error(err);
+            toast.error(err.response?.data?.message || 'Failed to add comment');
         }
     }
 
@@ -93,8 +103,15 @@ const SinglePost = () => {
 
             <ul className="singlePost__comments">
                 <form className="singlePost__comments-form" onSubmit={createComment}>
-                    <textarea placeholder={'Enter your comment...'} value={comment} onChange={(e) => setComment(e.target.value)}/>
-                    <button type={'submit'} className={'singlePost__comments-btn'}><IoMdSend/></button>
+                    <textarea 
+                        placeholder={'Enter your comment...'} 
+                        value={comment} 
+                        onChange={(e) => setComment(e.target.value)}
+                        required
+                    />
+                    <button type={'submit'} className={'singlePost__comments-btn'}>
+                        <IoMdSend/>
+                    </button>
                 </form>
                 {
                     post?.comments?.map(comment => <PostComment key={comment?._id} comment={comment} onDeleteComment={deleteComment}/>)

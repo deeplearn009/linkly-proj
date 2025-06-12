@@ -1,17 +1,38 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import ProfileImage from "./ProfileImage.jsx";
 import {useSelector} from "react-redux";
 import {SlPicture} from "react-icons/sl";
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { IoClose } from "react-icons/io5";
+import axios from "axios";
 
 const CreatePost = ({onCreatePost, error}) => {
+    const [user, setuser] = useState({})
+    const userId = useSelector(state => state?.user?.currentUser?.id)
+    const token = useSelector(state => state?.user?.currentUser?.token)
     const [body, setBody] = useState('');
     const [image, setImage] = useState('');
     const [imagePreview, setImagePreview] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const profilePhoto = useSelector(state => state?.user?.currentUser?.profilePhoto);
+    // const profilePhoto = useSelector(state => state?.user?.currentUser?.profilePhoto);
+
+
+    const getUser = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
+                withCredentials: true,
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            setuser(response?.data)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    useEffect(() => {
+        getUser()
+    }, [])
 
     const createPost = async (e) => {
         e.preventDefault();
@@ -105,7 +126,7 @@ const CreatePost = ({onCreatePost, error}) => {
                 variants={itemVariants}
             >
                 <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }}>
-                    <ProfileImage image={profilePhoto}/>
+                    <ProfileImage image={user?.profilePhoto}/>
                 </motion.div>
                 <motion.textarea 
                     value={body} 

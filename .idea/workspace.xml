@@ -6,17 +6,23 @@
   <component name="ChangeListManager">
     <list default="true" id="e33827a2-95ea-420d-9ce2-5898b2f75b1f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-backend/models/userModel.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/models/userModel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/ProfileImage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/ProfileImage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/Sidebar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/Sidebar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/controllers/userController.js" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-backend/controllers/userController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Adobe Express - file5b7364e9-c675-459e-bf00-e69feb11a6fb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Adobe Express - file5c594d24-1e4b-4b6c-8874-30ff26da2460.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Adobe Express - file69d508bf-65c8-4293-a7a8-489ef8758411.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Code_5oRpNyHtyMfe5b1bd4-8aa5-4a15-b4d9-4541c629a220.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Ferdium_uwElOGQe3K17f37564-c6d4-42d2-aeb4-8454873dd481.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Ferdium_uwElOGQe3K536ef555-4fae-4ac2-a003-611b36d47954.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Ferdium_uwElOGQe3K9bef4ea3-f697-459d-9a34-e83795b972ea.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Ferdium_uwElOGQe3Ke5977c71-6b03-464c-bfbb-5100d97d44b6.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/Ferdium_uwElOGQe3Kffc97ac9-5304-46a5-8e7d-4d8d283bb2ba.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-backend/uploads/chrome_R8dhymVdWq344f3aa6-cccb-4b68-969b-aead94c0f1b7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/CreatePost.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/CreatePost.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/Feed.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/Feed.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/PostComment.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/PostComment.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/header/Header.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/header/Header.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/components/layout/RootLayout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/components/layout/RootLayout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/linkly-frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Bookmarks.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Bookmarks.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Home.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Home.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Logout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Logout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/SinglePost.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/SinglePost.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linkly-frontend/src/pages/Profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/linkly-frontend/src/pages/Profile.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,8 +32,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JSX File" />
         <option value="JavaScript File" />
+        <option value="JSX File" />
       </list>
     </option>
   </component>
@@ -98,6 +104,9 @@
       <workItem from="1749640659946" duration="7520000" />
       <workItem from="1749648969687" duration="6473000" />
       <workItem from="1749655977949" duration="2774000" />
+      <workItem from="1749723391817" duration="7273000" />
+      <workItem from="1749731569677" duration="753000" />
+      <workItem from="1749732473090" duration="764000" />
     </task>
     <servers />
   </component>
