@@ -7,6 +7,8 @@ import {FaCheck} from "react-icons/fa6";
 import {userActions} from "../redux/user-slice.js";
 import {uiSliceActions} from "../redux/ui-slice.js";
 import FollowList from "./FollowList.jsx";
+import LikedPostsList from "./LikedPostsList.jsx";
+import { AnimatePresence } from 'framer-motion';
 
 const UserProfile = () => {
 
@@ -19,7 +21,9 @@ const UserProfile = () => {
     const [followsUser, setFollowsUser] = useState(user?.followers?.includes(loggedInUserId));
     const [avatar, setAvatar] = useState(user?.profilePhoto);
     const [showFollowList, setShowFollowList] = useState(false);
+    const [showLikedPosts, setShowLikedPosts] = useState(false);
     const [followListType, setFollowListType] = useState('');
+    const [likedPostsCount, setLikedPostsCount] = useState(0);
     const {id: userId} = useParams()
     const [avatarTouched, setAvatarTouched] = useState(false)
     const dispatch = useDispatch();
@@ -39,6 +43,17 @@ const UserProfile = () => {
         }
     }
 
+    const getLikedPostsCount = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}/likes`, {
+                withCredentials: true,
+                headers: {Authorization: `Bearer ${token}`}
+            })
+            setLikedPostsCount(response?.data?.length || 0)
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
     const changeAvatarHandler = async (e) => {
         e.preventDefault()
@@ -83,8 +98,17 @@ const UserProfile = () => {
         setFollowListType('');
     };
 
+    const handleLikedPostsClick = () => {
+        setShowLikedPosts(true);
+    };
+
+    const handleCloseLikedPosts = () => {
+        setShowLikedPosts(false);
+    };
+
     useEffect(() => {
-        getUser()
+        getUser();
+        getLikedPostsCount();
     }, [userId, followsUser, avatar])
 
 
@@ -110,8 +134,8 @@ const UserProfile = () => {
                         <h4>{user?.followers?.length}</h4>
                         <small>Followers</small>
                     </li>
-                    <li>
-                        <h4>0</h4>
+                    <li onClick={handleLikedPostsClick} style={{ cursor: 'pointer' }}>
+                        <h4>{likedPostsCount}</h4>
                         <small>Likes</small>
                     </li>
                 </ul>
@@ -123,17 +147,29 @@ const UserProfile = () => {
                     <p>{user?.bio}</p>
                 </article>
             </div>
-            {showFollowList && (
-                <>
-                    <div className="follow-list-overlay" onClick={handleCloseFollowList} />
-                    <FollowList
-                        type={followListType}
-                        userId={userId}
-                        onClose={handleCloseFollowList}
-                    />
-                </>
-            )}
+            <AnimatePresence>
+                {showFollowList && (
+                    <>
+                        <div className="follow-list-overlay" onClick={handleCloseFollowList} />
+                        <FollowList
+                            type={followListType}
+                            userId={userId}
+                            onClose={handleCloseFollowList}
+                        />
+                    </>
+                )}
+                {showLikedPosts && (
+                    <>
+                        <div className="liked-posts-overlay" onClick={handleCloseLikedPosts} />
+                        <LikedPostsList
+                            userId={userId}
+                            onClose={handleCloseLikedPosts}
+                        />
+                    </>
+                )}
+            </AnimatePresence>
         </section>
     )
 }
-export default UserProfile
+
+export default UserProfile;

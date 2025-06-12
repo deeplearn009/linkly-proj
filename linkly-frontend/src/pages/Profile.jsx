@@ -1,18 +1,16 @@
 import React, {useEffect, useState} from 'react'
-import UserProfile from "../components/UserProfile.jsx";
-import HeaderInfo from "../components/HeaderInfo.jsx";
+import UserProfile from "../components/UserProfile";
+import HeaderInfo from "../components/HeaderInfo";
 import axios from "axios";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
-import * as response from "framer-motion/m";
 import Feed from "../components/Feed.jsx";
 import EditPostModal from "../components/EditPostModal.jsx";
 import toast from 'react-hot-toast';
-import editProfileModal from "../components/EditProfileModal.jsx";
 import EditProfileModal from "../components/EditProfileModal.jsx";
+import './Profile.css';
 
 const Profile = () => {
-
     const [user, setUser] = useState({});
     const [userPosts, setUserPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +18,6 @@ const Profile = () => {
     const token = useSelector(state => state?.user?.currentUser?.token);
     const editPostModalOpen = useSelector(state => state?.ui?.editPostModalOpen);
     const editProfileModalOpen = useSelector(state => state?.ui?.editProfileModalOpen);
-
 
     const getUserPosts = async () => {
         setIsLoading(true);
@@ -37,9 +34,8 @@ const Profile = () => {
         setIsLoading(false);
     }
 
-
     useEffect(() => {
-        getUserPosts()
+        getUserPosts();
     }, [userId])
 
     const deletePost = async (postId) => {
@@ -86,13 +82,18 @@ const Profile = () => {
             <UserProfile />
             <HeaderInfo text={`${user?.fullName}'s posts`} />
             <section className="profile__posts">
-                {
-                    userPosts?.length < 1 ? <p className='center'>No posts found.</p> : userPosts?.map((post) => <Feed key={post?._id} post={post} onDeletePost={deletePost}/>)
-                }
+                {userPosts?.length < 1 ? (
+                    <p className='center'>No posts found.</p>
+                ) : (
+                    userPosts?.map((post) => (
+                        <Feed key={post?._id} post={post} onDeletePost={deletePost}/>
+                    ))
+                )}
             </section>
             {editPostModalOpen && <EditPostModal onUpdatePost={updatePost}/>}
             {editProfileModalOpen && <EditProfileModal/>}
         </section>
     )
 }
+
 export default Profile

@@ -2,30 +2,28 @@ import React, {useEffect, useState} from 'react'
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import {Link, useLocation} from "react-router-dom";
-import ProfileImage from "./ProfileImage.jsx";
+import ProfileImage from "./ProfileImage";
 import TimeAgo from "react-timeago";
 import {FaRegCommentDots} from "react-icons/fa";
 import {IoMdShare} from "react-icons/io";
 import {IoEllipsisHorizontal} from "react-icons/io5";
-import LikeDislikePost from "./LikeDislikePost.jsx";
-import TrimText from "../helpers/TrimText.jsx";
-import BookmarkPost from "./BookmarkPost.jsx";
+import LikeDislikePost from "./LikeDislikePost";
+import TrimText from "../helpers/TrimText";
+import BookmarkPost from "./BookmarkPost";
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import {uiSliceActions} from "../redux/ui-slice.js";
+import {uiSliceActions} from "../redux/ui-slice";
 
 const Feed = ({post, onDeletePost}) => {
-
-    const [creator, setCreator] = useState({})
+    const [creator, setCreator] = useState(post?.creator || {})
     const token = useSelector(state => state?.user?.currentUser?.token)
     const userId = useSelector(state => state?.user?.currentUser?.id)
     const [showFeedHeaderMenu, setShowFeedHeaderMenu] = useState(false);
     const dispatch = useDispatch();
-
     const location = useLocation();
 
-
     const getPostCreator = async () => {
+        if (post?.creator?._id) return; // Skip if creator is already populated
         try {
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${post?.creator}`, {
                 withCredentials: true,
@@ -39,7 +37,7 @@ const Feed = ({post, onDeletePost}) => {
 
     useEffect(() => {
         getPostCreator()
-    }, [])
+    }, [post?.creator])
 
     const closeFeedHeaderMenu = () => {
         setShowFeedHeaderMenu(false);
@@ -102,7 +100,7 @@ const Feed = ({post, onDeletePost}) => {
             transition={{ duration: 0.2 }}
         >
             <header className={'feed__header'}>
-                <Link to={`/users/${post?.creator}`} className={'feed__header-profile'}>
+                <Link to={`/users/${post?.creator?._id || post?.creator}`} className={'feed__header-profile'}>
                     <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }}>
                         <ProfileImage image={creator?.profilePhoto}/>
                     </motion.div>
@@ -188,4 +186,5 @@ const Feed = ({post, onDeletePost}) => {
         </motion.article>
     )
 }
-export default Feed
+
+export default Feed;

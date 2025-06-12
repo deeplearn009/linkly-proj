@@ -274,7 +274,32 @@ const getUserBookmarks = async (req, res, next) => {
     }
 }
 
+const getUserLikedPosts = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        
+        // Find all posts where the user's ID is in the likes array
+        const posts = await PostModel.find({ likes: userId })
+            .populate({
+                path: 'creator',
+                select: 'fullName profilePhoto email'
+            })
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'creator',
+                    select: 'fullName profilePhoto'
+                },
+                options: { sort: { createdAt: -1 } }
+            })
+            .sort({ createdAt: -1 });
 
-module.exports = {createPost, updatePost, deletePost, getPost, getPosts, getUserPosts, getUserBookmarks, createBookmark, likeDislikePost, getFollowingPosts}
+        res.json(posts);
+    } catch (error) {
+        return next(new HttpError(error));
+    }
+}
+
+module.exports = {createPost, updatePost, deletePost, getPost, getPosts, getUserPosts, getUserBookmarks, createBookmark, likeDislikePost, getFollowingPosts, getUserLikedPosts}
 
 

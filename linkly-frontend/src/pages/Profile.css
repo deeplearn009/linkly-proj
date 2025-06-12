@@ -1,0 +1,38 @@
+.profile__posts {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.center {
+    text-align: center;
+    color: #4a5568;
+    font-size: 1.1rem;
+    margin: 2rem 0;
+}
+
+/* Animation for the like button */
+.feed__footer-comments {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.feed__footer-comments:hover {
+    background: rgba(66, 153, 225, 0.1);
+}
+
+.feed__footer-comments svg {
+    font-size: 1.2rem;
+}
+
+.feed__footer-comments small {
+    font-size: 0.9rem;
+    color: #4a5568;
+} 
