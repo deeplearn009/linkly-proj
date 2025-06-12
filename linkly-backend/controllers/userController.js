@@ -6,6 +6,7 @@ const uuid = require('uuid').v4;
 const fs = require('fs');
 const path = require('path');
 const cloudinary = require('../utils/cloudinary');
+const CommentModel = require('../models/commentModel');
 
 
 const registerUser = async (req, res, next) => {
@@ -123,8 +124,12 @@ const editUser = async (req, res, next) => {
         const {fullName, bio} = req.body;
         const editedUser = await UserModel.findByIdAndUpdate(req.user.id,
             {fullName, bio}, {new: true})
+        // Update all comments with the new name and photo
+        await CommentModel.updateMany(
+            { "creator.creatorId": req.user.id },
+            { $set: { "creator.creatorName": fullName, "creator.creatorPhoto": editedUser.profilePhoto } }
+        );
         res.json(editedUser).status(200)
-
     } catch (err) {
         return next(new HttpError(err));
     }

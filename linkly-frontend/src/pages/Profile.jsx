@@ -8,6 +8,8 @@ import * as response from "framer-motion/m";
 import Feed from "../components/Feed.jsx";
 import EditPostModal from "../components/EditPostModal.jsx";
 import toast from 'react-hot-toast';
+import editProfileModal from "../components/EditProfileModal.jsx";
+import EditProfileModal from "../components/EditProfileModal.jsx";
 
 const Profile = () => {
 
@@ -17,6 +19,7 @@ const Profile = () => {
     const {id: userId} = useParams()
     const token = useSelector(state => state?.user?.currentUser?.token);
     const editPostModalOpen = useSelector(state => state?.ui?.editPostModalOpen);
+    const editProfileModalOpen = useSelector(state => state?.ui?.editProfileModalOpen);
 
 
     const getUserPosts = async () => {
@@ -88,6 +91,7 @@ const Profile = () => {
                 }
             </section>
             {editPostModalOpen && <EditPostModal onUpdatePost={updatePost}/>}
+            {editProfileModalOpen && <EditProfileModal/>}
         </section>
     )
 }

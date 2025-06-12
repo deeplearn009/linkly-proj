@@ -72,7 +72,7 @@ const UserProfile = () => {
 
     useEffect(() => {
         getUser()
-    }, [userId, followsUser, avatar])
+    }, [userId, followsUser, avatar, currentUser])
 
 
     return (

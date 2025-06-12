@@ -30,7 +30,7 @@ const BookmarkPost = ({post}) => {
 
     useEffect(() => {
         getUser()
-    }, [user, postBookmarked])
+    }, [userId])
 
 
 
