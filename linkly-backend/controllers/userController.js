@@ -193,4 +193,72 @@ const changeUserAvatar = async (req, res, next) => {
     }
 }
 
-module.exports = {registerUser, changeUserAvatar, editUser, loginUser, getUser, getUsers, followUnfollowUser}
+const getFollowers = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = await UserModel.findById(id).select('followers');
+        
+        if (!user) {
+            return next(new HttpError('User not found', 422));
+        }
+
+        const followers = await UserModel.find({ _id: { $in: user.followers } })
+            .select('_id fullName email profilePhoto');
+        
+        res.json(followers).status(200);
+    } catch (err) {
+        return next(new HttpError(err));
+    }
+};
+
+const getFollowing = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = await UserModel.findById(id).select('following');
+        
+        if (!user) {
+            return next(new HttpError('User not found', 422));
+        }
+
+        const following = await UserModel.find({ _id: { $in: user.following } })
+            .select('_id fullName email profilePhoto');
+        
+        res.json(following).status(200);
+    } catch (err) {
+        return next(new HttpError(err));
+    }
+};
+
+const removeFollower = async (req, res, next) => {
+    try {
+        const followerId = req.params.id;
+        const currentUserId = req.user.id;
+
+        // Remove follower from current user's followers list
+        await UserModel.findByIdAndUpdate(currentUserId, {
+            $pull: { followers: followerId }
+        });
+
+        // Remove current user from follower's following list
+        await UserModel.findByIdAndUpdate(followerId, {
+            $pull: { following: currentUserId }
+        });
+
+        res.json({ message: 'Follower removed successfully' }).status(200);
+    } catch (err) {
+        return next(new HttpError(err));
+    }
+};
+
+module.exports = {
+    registerUser,
+    changeUserAvatar,
+    editUser,
+    loginUser,
+    getUser,
+    getUsers,
+    followUnfollowUser,
+    getFollowers,
+    getFollowing,
+    removeFollower
+}

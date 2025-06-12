@@ -6,6 +6,7 @@ import {LuUpload} from "react-icons/lu";
 import {FaCheck} from "react-icons/fa6";
 import {userActions} from "../redux/user-slice.js";
 import {uiSliceActions} from "../redux/ui-slice.js";
+import FollowList from "./FollowList.jsx";
 
 const UserProfile = () => {
 
@@ -17,6 +18,8 @@ const UserProfile = () => {
     const [user, setUser] = useState({});
     const [followsUser, setFollowsUser] = useState(user?.followers?.includes(loggedInUserId));
     const [avatar, setAvatar] = useState(user?.profilePhoto);
+    const [showFollowList, setShowFollowList] = useState(false);
+    const [followListType, setFollowListType] = useState('');
     const {id: userId} = useParams()
     const [avatarTouched, setAvatarTouched] = useState(false)
     const dispatch = useDispatch();
@@ -70,6 +73,16 @@ const UserProfile = () => {
         }
     }
 
+    const handleFollowListClick = (type) => {
+        setFollowListType(type);
+        setShowFollowList(true);
+    };
+
+    const handleCloseFollowList = () => {
+        setShowFollowList(false);
+        setFollowListType('');
+    };
+
     useEffect(() => {
         getUser()
     }, [userId, followsUser, avatar])
@@ -89,11 +102,11 @@ const UserProfile = () => {
                 <h4>{user?.fullName}</h4>
                 <small>{user?.email}</small>
                 <ul className="profile__follows">
-                    <li>
+                    <li onClick={() => handleFollowListClick('following')} style={{ cursor: 'pointer' }}>
                         <h4>{user?.following?.length}</h4>
                         <small>Following</small>
                     </li>
-                    <li>
+                    <li onClick={() => handleFollowListClick('followers')} style={{ cursor: 'pointer' }}>
                         <h4>{user?.followers?.length}</h4>
                         <small>Followers</small>
                     </li>
@@ -110,6 +123,16 @@ const UserProfile = () => {
                     <p>{user?.bio}</p>
                 </article>
             </div>
+            {showFollowList && (
+                <>
+                    <div className="follow-list-overlay" onClick={handleCloseFollowList} />
+                    <FollowList
+                        type={followListType}
+                        userId={userId}
+                        onClose={handleCloseFollowList}
+                    />
+                </>
+            )}
         </section>
     )
 }

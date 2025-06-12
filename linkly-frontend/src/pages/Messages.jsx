@@ -6,6 +6,7 @@ import {userActions} from "../redux/user-slice.js";
 import ProfileImage from "../components/ProfileImage.jsx";
 import MessageItem from "../components/MessageItem.jsx";
 import {IoMdSend} from "react-icons/io";
+import { toast } from 'react-hot-toast';
 
 const Messages = () => {
 
@@ -36,32 +37,42 @@ const Messages = () => {
 
     const getMessages = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${receiverId}`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/messages/${receiverId}`, {
                 withCredentials: true,
                 headers: {Authorization: `Bearer ${token}`}
-            })
-            setMessages(response?.data)
-            setConversationId(response?.data?.[0]?.conversationId)
+            });
+            setMessages(response?.data || []);
+            if (response?.data?.length > 0) {
+                setConversationId(response?.data[0]?.conversationId);
+            }
         } catch (err) {
-            console.error(err)
+            console.error(err);
+            setMessages([]);
         }
-    }
+    };
 
     const socket = useSelector(state => state?.user?.socket)
 
     const sendMessage = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
+        if (!messageBody.trim()) return;
+        
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/messages/${receiverId}`, {
-                withCredentials: true,
-                headers: {Authorization: `Bearer ${token}`}
-            })
-            setMessages(prevMessages => [...prevMessages, response?.data])
-            setMessageBody("")
+            const response = await axios.post(
+                `${import.meta.env.VITE_API_URL}/messages/${receiverId}`,
+                { messageBody },
+                {
+                    withCredentials: true,
+                    headers: {Authorization: `Bearer ${token}`}
+                }
+            );
+            setMessages(prevMessages => [...prevMessages, response?.data]);
+            setMessageBody("");
         } catch (err) {
-            console.error(err)
+            console.error(err);
+            toast.error('Failed to send message');
         }
-    }
+    };
 
     const dispatch = useDispatch()
     const conversations = useSelector(state => state?.user?.conversations)

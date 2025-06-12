@@ -8,7 +8,10 @@ const {
     loginUser,
     getUser,
     getUsers,
-    followUnfollowUser
+    followUnfollowUser,
+    getFollowers,
+    getFollowing,
+    removeFollower
 } = require('../controllers/userController')
 
 const {
@@ -41,6 +44,9 @@ router.patch('/users/:id', authMiddleware, editUser)
 router.get('/users/:id/follow-unfollow', authMiddleware, followUnfollowUser)
 router.post('/users/avatar', authMiddleware, changeUserAvatar)
 router.get('/users/:id/posts', authMiddleware, getUserPosts)
+router.get('/users/:id/followers', authMiddleware, getFollowers)
+router.get('/users/:id/following', authMiddleware, getFollowing)
+router.delete('/users/:id/remove-follower', authMiddleware, removeFollower)
 
 
 // Post routes
