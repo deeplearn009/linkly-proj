@@ -847,6 +847,7 @@ FEEDS
     box-shadow: 0 2rem 2rem rgba(0, 0, 0, 0.15);
     width: 12rem;
     font-size: 0.9rem;
+    z-index: 1000;
 }
 
 .feed__header button {
@@ -877,18 +878,37 @@ FEEDS
     margin-bottom: 1rem;
 }
 
-.feed__media img,
-.feed__media video {
+.feed__media img {
     width: 100%;
     height: auto;
     object-fit: contain;
     border-radius: var(--radius-2);
 }
 
-.feed__video {
-    max-height: 60vh;
+.feed__video-wrapper {
     width: 100%;
+    position: relative;
     background: #000;
+    border-radius: var(--radius-2);
+    overflow: hidden;
+}
+
+.feed__video {
+    width: 100%;
+    max-height: 60vh;
+    display: block;
+    background: #000;
+}
+
+/* Remove hover effects from video container */
+.feed__video-wrapper:hover,
+.feed__video:hover {
+    transform: none !important;
+}
+
+/* Ensure video controls are clickable */
+.feed__video::-webkit-media-controls {
+    pointer-events: auto;
 }
 
 .feed__footer {

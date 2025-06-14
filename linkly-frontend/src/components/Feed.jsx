@@ -155,24 +155,23 @@ const Feed = ({post, onDeletePost}) => {
                         <TrimText item={post?.body} maxLength={160}/>
                     </motion.p>
                 </Link>
-                <motion.div 
-                    className="feed__media"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                >
+                <div className="feed__media">
                     {post?.mediaType === 'video' ? (
-                        <video 
-                            src={post?.image} 
-                            controls 
-                            className="feed__video"
-                            onClick={(e) => e.stopPropagation()}
-                        />
+                        <div className="feed__video-wrapper">
+                            <video 
+                                src={post?.image} 
+                                controls 
+                                className="feed__video"
+                                onClick={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
+                            />
+                        </div>
                     ) : (
                         <Link to={`/posts/${post?._id}`}>
                             <img src={post?.image} alt=""/>
                         </Link>
                     )}
-                </motion.div>
+                </div>
             </div>
             <footer className="feed__footer">
                 <div>
