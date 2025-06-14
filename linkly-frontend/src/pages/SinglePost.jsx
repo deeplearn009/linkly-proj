@@ -20,7 +20,6 @@ const SinglePost = () => {
     const [comment, setComment] = useState('')
     const token = useSelector(state => state?.user?.currentUser?.token)
 
-
     const getPost = async () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
@@ -33,7 +32,6 @@ const SinglePost = () => {
             setPost(null)
         }
     }
-
 
     const deleteComment = async (commentId) => {
         try {
@@ -69,7 +67,6 @@ const SinglePost = () => {
         }
     }
 
-
     useEffect(() => {
         getPost()
     }, [deleteComment])
@@ -88,8 +85,16 @@ const SinglePost = () => {
             </header>
             <div className="feed__body">
                 <p>{post?.body}</p>
-                <div className="feed__images">
-                    <img src={post?.image} alt=""/>
+                <div className="feed__media">
+                    {post?.mediaType === 'video' ? (
+                        <video 
+                            src={post?.image} 
+                            controls 
+                            className="feed__video"
+                        />
+                    ) : (
+                        <img src={post?.image} alt=""/>
+                    )}
                 </div>
             </div>
             <footer className="feed__footer">
@@ -117,7 +122,6 @@ const SinglePost = () => {
                     post?.comments?.map(comment => <PostComment key={comment?._id} comment={comment} onDeleteComment={deleteComment}/>)
                 }
             </ul>
-
         </section>
     )
 }

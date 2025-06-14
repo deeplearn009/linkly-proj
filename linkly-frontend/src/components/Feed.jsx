@@ -146,21 +146,34 @@ const Feed = ({post, onDeletePost}) => {
                     )}
                 </AnimatePresence>
             </header>
-            <Link to={`/posts/${post?._id}`} className={'feed__body'}>
-                <motion.p 
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    <TrimText item={post?.body} maxLength={160}/>
-                </motion.p>
+            <div className={'feed__body'}>
+                <Link to={`/posts/${post?._id}`}>
+                    <motion.p 
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <TrimText item={post?.body} maxLength={160}/>
+                    </motion.p>
+                </Link>
                 <motion.div 
-                    className="feed__images"
+                    className="feed__media"
                     whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                 >
-                    <img src={post?.image} alt=""/>
+                    {post?.mediaType === 'video' ? (
+                        <video 
+                            src={post?.image} 
+                            controls 
+                            className="feed__video"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    ) : (
+                        <Link to={`/posts/${post?._id}`}>
+                            <img src={post?.image} alt=""/>
+                        </Link>
+                    )}
                 </motion.div>
-            </Link>
+            </div>
             <footer className="feed__footer">
                 <div>
                     <LikeDislikePost post={post} />

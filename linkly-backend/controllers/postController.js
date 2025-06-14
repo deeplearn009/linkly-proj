@@ -7,40 +7,66 @@ const cloudinary = require('../utils/cloudinary');
 const fs = require('fs')
 const path = require('path')
 
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const createPost = async (req, res, next) => {
     try {
         const {body} = req.body
 
         if(!body) {
-            return next(new HttpError('Fill in text field and choose image', 422));
+            return next(new HttpError('Fill in text field and choose media', 422));
         }
 
-        if(!req.files.image) {
-            return next(new HttpError('Please choose an image', 422));
+        if(!req.files.media) {
+            return next(new HttpError('Please choose an image or video', 422));
         } else {
-            const {image} = req.files;
+            const {media} = req.files;
+            const fileExtension = media.name.split('.').pop().toLowerCase();
+            const isVideo = ['mp4', 'mov', 'avi', 'wmv'].includes(fileExtension);
+            const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension);
 
-            let filename = image.name
+            if (!isVideo && !isImage) {
+                return next(new HttpError('Please upload a valid image or video file', 422));
+            }
+
+            let filename = media.name
             filename = filename.split('.')
             filename = filename[0] + uuid() + '.' + filename[filename.length - 1]
-            await image.mv(path.join(__dirname, '..', 'uploads', filename), async (err) => {
+            await media.mv(path.join(__dirname, '..', 'uploads', filename), async (err) => {
                 if(err) {
                     return next(new HttpError(err));
                 }
 
-                const result = await cloudinary.uploader.upload(path.join(__dirname, '..', 'uploads', filename), {resource_type: "image"})
+                const result = await cloudinary.uploader.upload(
+                    path.join(__dirname, '..', 'uploads', filename), 
+                    {
+                        resource_type: isVideo ? "video" : "image",
+                        chunk_size: 6000000 // 6MB chunks for video uploads
+                    }
+                )
 
                 if(!result.secure_url) {
-                    return next(new HttpError("Could not upload image to cloudinary", 422));
+                    return next(new HttpError(`Could not upload ${isVideo ? 'video' : 'image'} to cloudinary`, 422));
                 }
 
-                const newPost = await PostModel.create({creator: req.user.id, body, image: result.secure_url})
+                const newPost = await PostModel.create({
+                    creator: req.user.id, 
+                    body, 
+                    image: result.secure_url,
+                    mediaType: isVideo ? 'video' : 'image'
+                })
                 await UserModel.findByIdAndUpdate(newPost?.creator, {$push: {posts: newPost?._id}})
                 res.json(newPost)
 
-
+                // Clean up the temporary file
+                fs.unlink(path.join(__dirname, '..', 'uploads', filename), (err) => {
+                    if (err) console.error('Error deleting temporary file:', err);
+                });
             })
-
         }
 
     } catch (error) {

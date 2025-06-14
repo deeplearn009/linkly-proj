@@ -5,6 +5,7 @@ import {SlPicture} from "react-icons/sl";
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { IoClose } from "react-icons/io5";
+import { BsCameraVideo } from "react-icons/bs";
 import axios from "axios";
 
 const CreatePost = ({onCreatePost, error}) => {
@@ -12,8 +13,9 @@ const CreatePost = ({onCreatePost, error}) => {
     const userId = useSelector(state => state?.user?.currentUser?.id)
     const token = useSelector(state => state?.user?.currentUser?.token)
     const [body, setBody] = useState('');
-    const [image, setImage] = useState('');
-    const [imagePreview, setImagePreview] = useState('');
+    const [media, setMedia] = useState('');
+    const [mediaPreview, setMediaPreview] = useState('');
+    const [mediaType, setMediaType] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     // const profilePhoto = useSelector(state => state?.user?.currentUser?.profilePhoto);
 
@@ -36,7 +38,7 @@ const CreatePost = ({onCreatePost, error}) => {
 
     const createPost = async (e) => {
         e.preventDefault();
-        if (!body.trim() && !image) {
+        if (!body.trim() && !media) {
             toast.error('Please add some content to your post');
             return;
         }
@@ -44,14 +46,15 @@ const CreatePost = ({onCreatePost, error}) => {
         setIsSubmitting(true);
         const postData = new FormData();
         postData.set('body', body);
-        postData.set('image', image);
+        postData.set('media', media);
         
         try {
             await onCreatePost(postData);
             toast.success('Post created successfully!');
             setBody('');
-            setImage('');
-            setImagePreview('');
+            setMedia('');
+            setMediaPreview('');
+            setMediaType('');
         } catch (err) {
             toast.error('Failed to create post');
         } finally {
@@ -59,21 +62,38 @@ const CreatePost = ({onCreatePost, error}) => {
         }
     }
 
-    const handleImageChange = (e) => {
+    const handleMediaChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setImage(file);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            const isVideo = ['mp4', 'mov', 'avi', 'wmv'].includes(fileExtension);
+            const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension);
+
+            if (!isVideo && !isImage) {
+                toast.error('Please upload a valid image or video file');
+                return;
+            }
+
+            setMedia(file);
+            setMediaType(isVideo ? 'video' : 'image');
+
+            if (isVideo) {
+                const videoUrl = URL.createObjectURL(file);
+                setMediaPreview(videoUrl);
+            } else {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setMediaPreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            }
         }
     };
 
-    const removeImage = () => {
-        setImage('');
-        setImagePreview('');
+    const removeMedia = () => {
+        setMedia('');
+        setMediaPreview('');
+        setMediaType('');
     };
 
     const containerVariants = {
@@ -137,19 +157,27 @@ const CreatePost = ({onCreatePost, error}) => {
             </motion.div>
             
             <AnimatePresence>
-                {imagePreview && (
+                {mediaPreview && (
                     <motion.div 
-                        className="createPost__image-preview"
+                        className="createPost__media-preview"
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         variants={itemVariants}
                     >
-                        <img src={imagePreview} alt="Preview" />
+                        {mediaType === 'video' ? (
+                            <video 
+                                src={mediaPreview} 
+                                controls 
+                                className="createPost__video-preview"
+                            />
+                        ) : (
+                            <img src={mediaPreview} alt="Preview" />
+                        )}
                         <motion.button 
                             type="button"
-                            className="createPost__remove-image"
-                            onClick={removeImage}
+                            className="createPost__remove-media"
+                            onClick={removeMedia}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                         >
@@ -170,18 +198,37 @@ const CreatePost = ({onCreatePost, error}) => {
                 className="createPost__actions"
                 variants={itemVariants}
             >
-                <motion.label 
-                    htmlFor="image"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                >
-                    <SlPicture/>
-                </motion.label>
+                <div className="createPost__media-buttons">
+                    <motion.label 
+                        htmlFor="image"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        title="Upload Image"
+                    >
+                        <SlPicture/>
+                    </motion.label>
+                    <motion.label 
+                        htmlFor="video"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        title="Upload Video"
+                    >
+                        <BsCameraVideo/>
+                    </motion.label>
+                </div>
                 <input 
                     type="file" 
-                    id={'image'} 
-                    onChange={handleImageChange}
+                    id="image" 
+                    onChange={handleMediaChange}
                     accept="image/*"
+                    style={{ display: 'none' }}
+                />
+                <input 
+                    type="file" 
+                    id="video" 
+                    onChange={handleMediaChange}
+                    accept="video/*"
+                    style={{ display: 'none' }}
                 />
                 <motion.button 
                     type="submit"
