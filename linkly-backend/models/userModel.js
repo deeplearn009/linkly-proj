@@ -6,6 +6,7 @@ const userSchema = new Schema({
     password: {type: String, required: true},
     profilePhoto: {type: String, default: "https://res.cloudinary.com/deaqvu2on/image/upload/v1749465286/Sample_User_Icon_qmu5gw.png"},
     bio: {type: String, default: 'no bio yet'},
+    role: {type: String, enum: ['user', 'admin'], default: 'user'},
     followers: [{type: Schema.Types.ObjectId, ref: "User"}],
     following: [{type: Schema.Types.ObjectId, ref: "User"}],
     bookmarks: [{type: Schema.Types.ObjectId, ref: "Post"}],

@@ -5,6 +5,7 @@ const cors = require('cors');
 const upload = require('express-fileupload')
 const {notFound, errorHandler} = require("./middleware/errorMiddleware");
 const routes = require('./routes/routes');
+const adminRoutes = require('./routes/admin');
 const {server, app} = require("./socket/socket");
 
 app.use(express.urlencoded({ extended: true }));
@@ -13,6 +14,7 @@ app.use(cors({credentials: true, origin: ["http://localhost:5173"]}));
 app.use(upload())
 
 app.use('/api', routes)
+app.use('/api/admin', adminRoutes)
 
 app.use(notFound);
 app.use(errorHandler);

@@ -15,6 +15,12 @@ import {Provider} from "react-redux";
 import store from "./redux/store/store.js";
 import { Toaster } from 'react-hot-toast';
 import { AnimatePresence } from 'framer-motion';
+import AdminLayout from './pages/Admin/AdminLayout';
+import Dashboard from './pages/Admin/Dashboard';
+import Users from './pages/Admin/Users';
+import Comments from './pages/Admin/Comments';
+import Posts from './pages/Admin/Posts';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 const router = createBrowserRouter([
     {
@@ -25,6 +31,20 @@ const router = createBrowserRouter([
             {path: 'bookmarks', element: <Bookmarks/>},
             {path: 'users/:id', element: <Profile/>},
             {path: 'posts/:id', element: <SinglePost/>},
+        ]
+    },
+    {
+        path: '/admin',
+        element: (
+            <ProtectedAdminRoute>
+                <AdminLayout/>
+            </ProtectedAdminRoute>
+        ),
+        children: [
+            {index: true, element: <Dashboard/>},
+            {path: 'users', element: <Users/>},
+            {path: 'comments', element: <Comments/>},
+            {path: 'posts', element: <Posts/>},
         ]
     },
     {path: '/login', element: <Login/>},

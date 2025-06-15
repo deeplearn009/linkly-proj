@@ -84,7 +84,8 @@ const loginUser = async (req, res, next) => {
             id: user?._id,
             fullName: user?.fullName,
             email: user?.email,
-            profilePhoto: user?.profilePhoto
+            profilePhoto: user?.profilePhoto,
+            role: user?.role || 'user'
         }).status(200);
 
     } catch (err) {
