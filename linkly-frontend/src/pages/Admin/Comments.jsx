@@ -215,15 +215,30 @@ const Comments = () => {
 
             {selectedPost.image && (
               <div style={{ marginBottom: window.innerWidth < 768 ? '12px' : '20px' }}>
-                <img 
-                  src={selectedPost.image} 
-                  alt="Post" 
-                  style={{ 
-                    maxWidth: '100%', 
-                    borderRadius: '8px',
-                    marginBottom: window.innerWidth < 768 ? '8px' : '10px'
-                  }} 
-                />
+                {selectedPost.image.endsWith('.mp4') ? (
+                  <video 
+                    controls 
+                    style={{ 
+                      width: '100%', 
+                      maxHeight: '400px',
+                      borderRadius: '8px',
+                      objectFit: 'contain'
+                    }}
+                  >
+                    <source src={selectedPost.image} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img 
+                    src={selectedPost.image} 
+                    alt="Post" 
+                    style={{ 
+                      maxWidth: '100%', 
+                      borderRadius: '8px',
+                      marginBottom: window.innerWidth < 768 ? '8px' : '10px'
+                    }} 
+                  />
+                )}
               </div>
             )}
 

@@ -111,8 +111,20 @@ const getUser = async (req, res, next) => {
 
 const getUsers = async (req, res, next) => {
     try {
-        const users = await UserModel.find().limit(10).sort({createdAt: -1})
-        res.json(users)
+        // If user is admin, show all users
+        if (req.user.role === 'admin') {
+            const users = await UserModel.find()
+                .select('-password')
+                .sort({ createdAt: -1 });
+            return res.json(users);
+        }
+
+        // For regular users, filter out admin users
+        const users = await UserModel.find({ role: { $ne: 'admin' } })
+            .select('-password')
+            .limit(10)
+            .sort({ createdAt: -1 });
+        res.json(users);
     } catch (err) {
         return next(new HttpError(err));
     }
@@ -203,7 +215,15 @@ const getFollowers = async (req, res, next) => {
             return next(new HttpError('User not found', 422));
         }
 
-        const followers = await UserModel.find({ _id: { $in: user.followers } })
+        // Base query for followers
+        const query = { _id: { $in: user.followers } };
+
+        // If user is not admin, exclude admin users
+        if (req.user.role !== 'admin') {
+            query.role = { $ne: 'admin' };
+        }
+
+        const followers = await UserModel.find(query)
             .select('_id fullName email profilePhoto');
         
         res.json(followers).status(200);
@@ -221,7 +241,15 @@ const getFollowing = async (req, res, next) => {
             return next(new HttpError('User not found', 422));
         }
 
-        const following = await UserModel.find({ _id: { $in: user.following } })
+        // Base query for following
+        const query = { _id: { $in: user.following } };
+
+        // If user is not admin, exclude admin users
+        if (req.user.role !== 'admin') {
+            query.role = { $ne: 'admin' };
+        }
+
+        const following = await UserModel.find(query)
             .select('_id fullName email profilePhoto');
         
         res.json(following).status(200);
@@ -259,14 +287,22 @@ const searchUsers = async (req, res, next) => {
             return res.json([]);
         }
 
-        const users = await UserModel.find({
+        // Base query for user search
+        const searchQuery = {
             $or: [
                 { fullName: { $regex: query, $options: 'i' } },
                 { email: { $regex: query, $options: 'i' } }
             ]
-        })
-        .select('fullName profilePhoto email')
-        .limit(5);
+        };
+
+        // If user is not admin, exclude admin users from search
+        if (req.user.role !== 'admin') {
+            searchQuery.role = { $ne: 'admin' };
+        }
+
+        const users = await UserModel.find(searchQuery)
+            .select('fullName profilePhoto email')
+            .limit(5);
 
         res.json(users);
     } catch (error) {
