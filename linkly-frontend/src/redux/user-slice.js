@@ -4,7 +4,7 @@ const userSlice = createSlice({
     name: "user",
     initialState: {
         currentUser: JSON.parse(localStorage.getItem("currentUser")) || null,
-        socket: null,
+        socketConnected: false,
         onlineUsers: [],
         isAuthenticated: !!JSON.parse(localStorage.getItem("currentUser")),
         isAdmin: JSON.parse(localStorage.getItem("currentUser"))?.role === 'admin',
@@ -23,8 +23,8 @@ const userSlice = createSlice({
                 localStorage.removeItem("currentUser");
             }
         },
-        setSocket: (state, action) => {
-            state.socket = action.payload;
+        setSocketConnected: (state, action) => {
+            state.socketConnected = action.payload;
         },
         setOnlineUsers: (state, action) => {
             state.onlineUsers = action.payload;
@@ -39,7 +39,7 @@ const userSlice = createSlice({
             state.currentUser = null;
             state.isAuthenticated = false;
             state.isAdmin = false;
-            state.socket = null;
+            state.socketConnected = false;
             state.onlineUsers = [];
             state.error = null;
             localStorage.removeItem("currentUser");

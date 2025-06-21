@@ -7,6 +7,7 @@ import ProfileImage from "../components/ProfileImage.jsx";
 import MessageItem from "../components/MessageItem.jsx";
 import {IoMdSend} from "react-icons/io";
 import { toast } from 'react-hot-toast';
+import socketService from '../services/socketService.js';
 
 const Messages = () => {
 
@@ -18,6 +19,7 @@ const Messages = () => {
     const messageEndRef = useRef()
 
     const token = useSelector((state) => state?.user?.currentUser?.token)
+    const currentUserId = useSelector((state) => state?.user?.currentUser?.id || state?.user?.currentUser?._id)
 
     const getOtherMessager = async () => {
         try {
@@ -51,8 +53,6 @@ const Messages = () => {
         }
     };
 
-    const socket = useSelector(state => state?.user?.socket)
-
     const sendMessage = async (e) => {
         e.preventDefault();
         if (!messageBody.trim()) return;
@@ -78,18 +78,35 @@ const Messages = () => {
     const conversations = useSelector(state => state?.user?.conversations)
 
     useEffect(() => {
-        socket?.on("newMessage", message => {
-            setMessages(prevMessages => [...prevMessages, message])
+        if (!socketService.isConnected()) return;
 
-            dispatch(userActions?.setConversations(conversations.map(conversation => {
-                if(conversation?._id == conversationId) {
-                    return {...conversation, lastMessage: {...conversation.lastMessage, seen: true}};
-                }
-            })))
+        const handleNewMessage = (message) => {
+            // Don't add the message if it's from the current user (to prevent duplicates)
+            if (message?.senderId === currentUserId) {
+                return;
+            }
+            
+            setMessages(prevMessages => [...prevMessages, message]);
 
-            return () => socket.off("newMessage")
-        })
-    }, [socket, messages]);
+            // Update conversations if needed
+            if (conversations && conversationId) {
+                dispatch(userActions?.setConversations(conversations.map(conversation => {
+                    if(conversation?._id == conversationId) {
+                        return {...conversation, lastMessage: {...conversation.lastMessage, seen: true}};
+                    }
+                    return conversation;
+                })));
+            }
+        };
+
+        // Add event listener
+        socketService.on("newMessage", handleNewMessage);
+
+        // Cleanup function
+        return () => {
+            socketService.off("newMessage", handleNewMessage);
+        };
+    }, [conversationId, conversations, dispatch, currentUserId]);
 
     useEffect(() => {
         getMessages()

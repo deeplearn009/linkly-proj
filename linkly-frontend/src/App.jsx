@@ -21,6 +21,10 @@ import Users from './pages/Admin/Users';
 import Comments from './pages/Admin/Comments';
 import Posts from './pages/Admin/Posts';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+import { useDispatch, useSelector } from 'react-redux';
+import { userActions } from './redux/user-slice.js';
+import { useEffect } from 'react';
+import socketService from './services/socketService.js';
 
 const router = createBrowserRouter([
     {
@@ -52,9 +56,64 @@ const router = createBrowserRouter([
     {path: '/logout', element: <Logout/>},
 ])
 
+// Separate component for socket logic that can use Redux hooks
+const SocketManager = () => {
+    const dispatch = useDispatch();
+    const currentUser = useSelector((state) => state.user.currentUser);
+
+    useEffect(() => {
+        // Check for user ID in different possible fields
+        const userId = currentUser?.id || currentUser?._id;
+        
+        if (userId && currentUser?.token) {
+            // Test if backend is reachable first
+            (async () => {
+                try {
+                    const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:6060';
+                    const cleanUrl = socketUrl.replace(/\/$/, '').replace(/\/socket\.io.*$/, '').replace(/\/api.*$/, '');
+                    
+                    
+                    // Connect socket
+                    socketService.connect(userId);
+                    
+                } catch (error) {
+                    // Backend not reachable, skip socket connection
+                }
+            })();
+        } else {
+            // Disconnect socket if no user
+            socketService.disconnect();
+        }
+
+        // Set up socket event listeners
+        const handleConnection = (data) => {
+            dispatch(userActions.setSocketConnected(data.connected));
+        };
+
+        const handleOnlineUsers = (onlineUsers) => {
+            dispatch(userActions.setOnlineUsers(onlineUsers));
+        };
+
+        // Add listeners
+        socketService.on('connection', handleConnection);
+        socketService.on('onlineUsers', handleOnlineUsers);
+
+        // Cleanup on unmount or user change
+        return () => {
+            socketService.off('connection', handleConnection);
+            socketService.off('onlineUsers', handleOnlineUsers);
+            socketService.disconnect();
+            dispatch(userActions.setSocketConnected(false));
+        };
+    }, [currentUser?.id, currentUser?._id, currentUser?.token, dispatch]);
+
+    return null; // This component doesn't render anything
+};
+
 const App = () => {
     return (
         <Provider store={store}>
+            <SocketManager />
             <AnimatePresence mode="wait">
                 <RouterProvider router={router}/>
                 <Toaster 
