@@ -22,6 +22,12 @@ app.use(cors({
   credentials: true,
 }));
 
+// Handle preflight OPTIONS requests for all routes
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 app.use(upload())
 app.use('/api', routes)
 app.use('/api/admin', adminRoutes)
