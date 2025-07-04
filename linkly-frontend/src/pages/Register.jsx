@@ -21,7 +21,7 @@ const Register = () => {
         e.preventDefault();
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/users/register`, userData)
-            if(response.statusText == "OK") {
+            if(response.status === 201 || response.status === 200) {
                 navigate("/login")
             }
         } catch (err) {
