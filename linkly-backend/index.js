@@ -6,6 +6,7 @@ const upload = require('express-fileupload')
 const {notFound, errorHandler} = require("./middleware/errorMiddleware");
 const routes = require('./routes/routes');
 const adminRoutes = require('./routes/admin');
+const storyRoutes = require('./routes/story');
 const {server, app} = require("./socket/socket");
 
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +34,7 @@ app.options('*', cors({
 app.use(upload())
 app.use('/api', routes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/stories', storyRoutes)
 
 app.use(notFound);
 app.use(errorHandler);

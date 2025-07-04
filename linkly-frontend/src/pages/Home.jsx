@@ -3,6 +3,7 @@ import {useSelector} from "react-redux";
 import CreatePost from "../components/CreatePost.jsx";
 import axios from "axios";
 import Feeds from "../components/Feeds.jsx";
+import StoriesBar from '../components/StoriesBar';
 
 const Home = () => {
     const [posts, setPosts] = useState([]);
@@ -21,7 +22,7 @@ const Home = () => {
             const newPost = response?.data;
             setPosts([newPost, ...posts]);
         } catch (err) {
-            setError(err?.response?.data?.message);
+            setError(err?.response?.data?.message || 'Failed to create post');
         }
     }
 
@@ -36,6 +37,7 @@ const Home = () => {
             setPosts(response?.data);
         } catch (err) {
             console.error(err)
+            setPosts([]);
         }
         setIsLoading(false);
     }
@@ -46,6 +48,7 @@ const Home = () => {
 
     return (
         <section className="mainArea">
+            <StoriesBar />
             <div className="forYouOrFollowing">
                 <button 
                     className={feedType === 'forYou' ? 'active' : ''} 
