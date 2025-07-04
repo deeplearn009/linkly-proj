@@ -20,7 +20,7 @@ const UserProfile = () => {
 
     const [user, setUser] = useState({});
     const [followsUser, setFollowsUser] = useState(user?.followers?.includes(loggedInUserId));
-    const [avatar, setAvatar] = useState(user?.profilePhoto);
+    const [avatar, setAvatar] = useState(null);
     const [showFollowList, setShowFollowList] = useState(false);
     const [showLikedPosts, setShowLikedPosts] = useState(false);
     const [followListType, setFollowListType] = useState('');
@@ -30,6 +30,8 @@ const UserProfile = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate()
 
+    const DEFAULT_AVATAR = "https://res.cloudinary.com/deaqvu2on/image/upload/v1749465286/Sample_User_Icon_qmu5gw.png";
+
     const getUser = async () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
@@ -38,7 +40,6 @@ const UserProfile = () => {
             })
             setUser(response?.data)
             setFollowsUser(response?.data?.followers?.includes(loggedInUserId))
-            setAvatar(response?.data?.profilePhoto)
         } catch (err) {
             console.error(err);
         }
@@ -57,21 +58,39 @@ const UserProfile = () => {
     }
 
     const changeAvatarHandler = async (e) => {
-        e.preventDefault()
-        setAvatarTouched(true)
+        e.preventDefault();
+        setAvatarTouched(true);
+        if (!(avatar instanceof File)) return; // Only submit if avatar is a File
         try {
-            const postData = new FormData()
-            postData.set("avatar", avatar)
+            const postData = new FormData();
+            postData.append("avatar", avatar);
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/users/avatar`, postData, {
                 withCredentials: true,
                 headers: {Authorization: `Bearer ${token}`}
-            })
-            dispatch(userActions?.changeCurrentUser({...currentUser,profilePhoto: response?.data?.profilePhoto}))
-            navigate(0)
+            });
+            dispatch(userActions?.changeCurrentUser({...currentUser,profilePhoto: response?.data?.profilePhoto}));
+            setAvatar(null); // Reset avatar after upload
+            setAvatarTouched(false);
+            navigate(0);
         } catch (err) {
-            console.error(err)
+            console.error(err);
         }
     }
+
+    const removeAvatarHandler = async () => {
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/users/avatar`, {
+                withCredentials: true,
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            dispatch(userActions?.changeCurrentUser({ ...currentUser, profilePhoto: DEFAULT_AVATAR }));
+            setAvatar(null);
+            setAvatarTouched(false);
+            navigate(0);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const openEditProfileModal = () => {
         dispatch(uiSliceActions.openEditProfileModal())
@@ -122,14 +141,31 @@ const UserProfile = () => {
     return (
         <section className="profile">
             <div className="profile__container">
-                <form className={'profile__image'} onSubmit={changeAvatarHandler} encType={'multipart/form-data'}>
-                    <img src={user?.profilePhoto} alt=""/>
-                    {!avatarTouched ? <label htmlFor="avatar" className={'profile__image-edit'}>
-                        <span><LuUpload/></span>
-                    </label> :
-                    <button type={'submit'} className={'profile__image-btn'}><FaCheck/></button>}
-                    <input type="file" name={'avatar'} id={'avatar'} onChange={e => {setAvatar(e.target.files[0]); setAvatarTouched(true)}} accept={'png, jpg, jpeg, img'} />
-                </form>
+                {/* Avatar and Remove Button Column */}
+                <div className="profile__avatar-row">
+                  <div className="profile__avatar-container">
+                    <form className="profile__image" onSubmit={changeAvatarHandler} encType="multipart/form-data">
+                      <img src={user?.profilePhoto} alt="" />
+                      {avatar instanceof File ? (
+                        <button type="submit" className="profile__image-btn profile__image-btn--check"><FaCheck /></button>
+                      ) : (
+                        <label htmlFor="avatar" className="profile__image-edit">
+                          <span><LuUpload /></span>
+                        </label>
+                      )}
+                      <input type="file" name="avatar" id="avatar" onChange={e => {setAvatar(e.target.files[0]); setAvatarTouched(true)}} accept=".png, .jpg, .jpeg, .img" style={{ display: 'none' }} />
+                    </form>
+                    {user?.profilePhoto && user?.profilePhoto !== DEFAULT_AVATAR && (
+                      <button
+                        type="button"
+                        className="profile__remove-btn"
+                        onClick={removeAvatarHandler}
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
                 <h4>{user?.fullName}</h4>
                 <small>{user?.email}</small>
                 <ul className="profile__follows">
@@ -194,3 +230,4 @@ const UserProfile = () => {
 }
 
 export default UserProfile;
+

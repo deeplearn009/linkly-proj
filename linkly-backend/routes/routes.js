@@ -14,7 +14,8 @@ const {
     getFollowers,
     getFollowing,
     removeFollower,
-    searchUsers
+    searchUsers,
+    removeUserAvatar
 } = require('../controllers/userController')
 
 const {
@@ -56,6 +57,7 @@ router.get('/users/:id/followers', authMiddleware, getFollowers)
 router.get('/users/:id/following', authMiddleware, getFollowing)
 router.delete('/users/:id/remove-follower', authMiddleware, removeFollower)
 router.get('/search/users', authMiddleware, searchUsers)
+router.delete('/users/avatar', authMiddleware, removeUserAvatar)
 
 
 // Post routes

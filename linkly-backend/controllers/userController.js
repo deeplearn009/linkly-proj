@@ -193,7 +193,9 @@ const followUnfollowUser = async (req, res, next) => {
 
 const changeUserAvatar = async (req, res, next) => {
     try {
-        if (!req.files.avatar) {
+        console.log('req.files:', req.files); // Debug log
+        console.log('req.body:', req.body); // Debug log
+        if (!req.files || !req.files.avatar) {
             return next(new HttpError('Please choose an image', 422));
         }
 
@@ -356,6 +358,20 @@ const changeUserBanner = async (req, res, next) => {
     }
 }
 
+const removeUserAvatar = async (req, res, next) => {
+    try {
+        const defaultAvatar = "https://res.cloudinary.com/deaqvu2on/image/upload/v1749465286/Sample_User_Icon_qmu5gw.png";
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            req.user.id,
+            { profilePhoto: defaultAvatar },
+            { new: true }
+        );
+        res.json(updatedUser).status(200);
+    } catch (err) {
+        return next(new HttpError(err));
+    }
+};
+
 module.exports = {
     registerUser,
     changeUserAvatar,
@@ -368,5 +384,6 @@ module.exports = {
     getFollowers,
     getFollowing,
     removeFollower,
-    searchUsers
+    searchUsers,
+    removeUserAvatar
 }

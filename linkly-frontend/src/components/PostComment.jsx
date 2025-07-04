@@ -3,6 +3,7 @@ import {useSelector} from "react-redux";
 import TimeAgo from "react-timeago";
 import {FaRegTrashAlt} from "react-icons/fa";
 import axios from "axios";
+import ProfileImage from "./ProfileImage.jsx";
 
 const PostComment = ({comment, onDeleteComment}) => {
     const token = useSelector(state => state?.user?.currentUser?.token)
@@ -20,10 +21,10 @@ const PostComment = ({comment, onDeleteComment}) => {
             <div className="singlePost__comment-content">
                 <div className="singlepost__comment-wrapper">
                     <div className="singlePost__comment-author">
-                        <img src={comment?.creator?.creatorPhoto} alt=""/>
+                        <ProfileImage image={comment?.creator?.creatorPhoto || comment?.creator?.profilePhoto} />
                     </div>
                     <div className="singlePost__comment-header">
-                        <h5>{comment?.creator?.creatorName}</h5>
+                        <h5>{comment?.creator?.creatorName || comment?.creator?.fullName}</h5>
                         <small><TimeAgo date={comment?.createdAt}/></small>
                     </div>
                 </div>
