@@ -127,34 +127,29 @@ const StoryViewer = ({ user, onClose }) => {
   return (
     <div
       className="story-viewer-overlay"
-      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={e => {
-        // Only close if the click is directly on the overlay, not on children
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="story-viewer-modal" style={{ background: 'rgba(0,0,0,0.95)', borderRadius: 12, padding: 0, minWidth: 580, maxWidth: 700, width: '90vw', maxHeight: '90vh', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+      <div className="story-viewer-modal" onClick={e => e.stopPropagation()}>
         {/* User info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%' }}>
+        <div className="story-viewer-header">
           <ProfileImage image={user.profilePhoto} />
-          <span style={{ color: 'white', fontWeight: 600 }}>{user.fullName}</span>
-          <button onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer' }}>&times;</button>
-          {/* Add Story + button for own stories */}
+          <span className="story-viewer-username">{user.fullName}</span>
+          <button className="story-viewer-close" onClick={onClose}>&times;</button>
           {user._id === currentUserId && (
             <button
               title="Add Story"
+              className="story-viewer-add"
               onClick={() => setShowUploader(true)}
-              style={{ marginLeft: 12, background: '#2563eb', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               +
             </button>
           )}
         </div>
         {/* Story content */}
-        <div style={{ width: '100%', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          {/* Left arrow */}
-          {current > 0 && <button onClick={handlePrev} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#fff', fontSize: 32, cursor: 'pointer', zIndex: 2 }}>&#8592;</button>}
-          {/* Story media */}
+        <div className="story-viewer-content">
+          {current > 0 && <button className="story-viewer-arrow left" onClick={handlePrev}>&#8592;</button>}
           <AnimatePresence mode="wait">
             <motion.div
               key={stories[current]._id}
@@ -162,50 +157,48 @@ const StoryViewer = ({ user, onClose }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.3 }}
-              style={{ width: '100%', display: 'flex', justifyContent: 'center', position: 'relative' }}
+              className="story-viewer-media-wrapper"
             >
               {stories[current].mediaType === 'video' ? (
                 <video
                   src={stories[current].mediaUrl}
                   controls
                   autoPlay
-                  style={{ maxWidth: '100%', maxHeight: '75vh', borderRadius: 8 }}
+                  className="story-viewer-media"
                   onEnded={handleVideoEnded}
                 />
               ) : (
-                <img src={stories[current].mediaUrl} alt="Story" style={{ maxWidth: '100%', maxHeight: '75vh', borderRadius: 8 }} />
+                <img src={stories[current].mediaUrl} alt="Story" className="story-viewer-media" />
               )}
-              {/* Delete and Seen-by for own stories */}
               {user._id === currentUserId && (
-                <div style={{ position: 'absolute', top: 12, right: 12, display: 'flex', gap: 8 }}>
-                  <button title="Delete Story" onClick={() => handleDelete(stories[current]._id)} style={{ background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', borderRadius: 6, padding: 6, cursor: 'pointer', fontSize: 18 }}><FaTrash /></button>
-                  <button title="Seen by" onClick={() => handleShowViewers(stories[current]._id)} style={{ background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', borderRadius: 6, padding: 6, cursor: 'pointer', fontSize: 18 }}><FaEye /></button>
+                <div className="story-viewer-actions">
+                  <button title="Delete Story" onClick={() => handleDelete(stories[current]._id)} className="story-viewer-action-btn"><FaTrash /></button>
+                  <button title="Seen by" onClick={() => handleShowViewers(stories[current]._id)} className="story-viewer-action-btn"><FaEye /></button>
                 </div>
               )}
             </motion.div>
           </AnimatePresence>
-          {/* Right arrow */}
-          {current < stories.length - 1 && <button onClick={handleNext} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#fff', fontSize: 32, cursor: 'pointer', zIndex: 2 }}>&#8594;</button>}
+          {current < stories.length - 1 && <button className="story-viewer-arrow right" onClick={handleNext}>&#8594;</button>}
         </div>
         {/* Progress bar */}
-        <div style={{ display: 'flex', gap: 4, width: '100%', padding: '8px 16px' }}>
+        <div className="story-viewer-progress">
           {stories.map((s, i) => (
-            <div key={s._id} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= current ? '#2563eb' : '#444', transition: 'background 0.2s' }} />
+            <div key={s._id} className={`story-viewer-progress-bar${i <= current ? ' active' : ''}`} />
           ))}
         </div>
         {/* Seen-by modal */}
         {showViewers && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.6)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowViewers(false)}>
-            <div style={{ background: '#fff', borderRadius: 12, minWidth: 320, maxWidth: 400, padding: 24, maxHeight: 400, overflowY: 'auto', position: 'relative' }} onClick={e => e.stopPropagation()}>
-              <h4 style={{ marginBottom: 12 }}>Seen by</h4>
-              <button onClick={() => setShowViewers(false)} style={{ position: 'absolute', top: 8, right: 12, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }}>&times;</button>
+          <div className="story-viewer-seenby-overlay" onClick={() => setShowViewers(false)}>
+            <div className="story-viewer-seenby-modal" onClick={e => e.stopPropagation()}>
+              <h4>Seen by</h4>
+              <button className="story-viewer-seenby-close" onClick={() => setShowViewers(false)}>&times;</button>
               {isLoadingViewers ? (
                 <div>Loading...</div>
               ) : viewers.length === 0 ? (
                 <div style={{ color: '#888' }}>No viewers yet</div>
               ) : (
                 Array.from(new Map(viewers.map(v => [v._id, v])).values()).map(v => (
-                  <div key={v._id} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <div key={v._id} className="story-viewer-seenby-user">
                     <ProfileImage image={v.profilePhoto} style={{ width: 32, height: 32 }} />
                     <span>{v.fullName}</span>
                   </div>
