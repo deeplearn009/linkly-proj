@@ -6,6 +6,8 @@ const uuid = require('uuid').v4;
 const fs = require('fs');
 const path = require('path');
 const cloudinary = require('../utils/cloudinary');
+const Notification = require('../models/notificationModel');
+const { io, getReceiverSocketId } = require('../socket/socket');
 
 
 const registerUser = async (req, res, next) => {
@@ -150,22 +152,28 @@ const followUnfollowUser = async (req, res, next) => {
         if (req.user.id === userToFollowId) {
             return next(new HttpError('You cant follow yourself', 422));
         }
-
         const currentUser = await UserModel.findById(req.user.id)
         const isFollowing = currentUser?.following?.includes(userToFollowId);
-
         //follow if not following
-
         if (!isFollowing) {
             const updatedUser = await UserModel.findByIdAndUpdate(userToFollowId, {$push: {followers: req.user.id}}, {new: true})
             await UserModel.findByIdAndUpdate(req.user.id, {$push: {following: userToFollowId}}, {new: true})
+            // Notify followed user
+            const notification = await Notification.create({
+                recipient: userToFollowId,
+                sender: req.user.id,
+                type: 'follow'
+            });
+            const receiverSocketId = getReceiverSocketId(userToFollowId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('notification', notification);
+            }
             res.json(updatedUser).status(200)
         } else {
             const updatedUser = await UserModel.findByIdAndUpdate(userToFollowId, {$pull: {followers: req.user.id}}, {new: true})
             await UserModel.findByIdAndUpdate(req.user.id, {$pull: {following: userToFollowId}}, {new: true})
             res.json(updatedUser).status(200)
         }
-
     } catch (err) {
         return next(new HttpError(err));
     }

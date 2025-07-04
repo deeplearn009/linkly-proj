@@ -1,6 +1,8 @@
 const HttpError = require('../models/errorModel')
 const PostModel = require('../models/postModel')
 const UserModel = require('../models/userModel')
+const Notification = require('../models/notificationModel')
+const { io, getReceiverSocketId } = require('../socket/socket')
 
 const {v4: uuid} = require('uuid')
 const cloudinary = require('../utils/cloudinary');
@@ -217,19 +219,29 @@ const getFollowingPosts = async (req, res, next) => {
 const likeDislikePost = async (req, res, next) => {
     try {
         const {id} = req.params
-
         const post = await PostModel.findById(id)
-
-        //if liked or not
         let updatedPost
-        if(post?.likes.includes(req.user.id)) {
+        const isLiked = post?.likes.includes(req.user.id)
+        if(isLiked) {
             updatedPost = await PostModel.findByIdAndUpdate(id, {$pull: {likes: req.user.id}}, {new: true})
         } else {
             updatedPost = await PostModel.findByIdAndUpdate(id, {$push: {likes: req.user.id}}, {new: true})
+            // Create notification only if not liking own post
+            if (post?.creator.toString() !== req.user.id) {
+                const notification = await Notification.create({
+                    recipient: post.creator,
+                    sender: req.user.id,
+                    type: 'like',
+                    post: post._id
+                });
+                // Emit real-time notification
+                const receiverSocketId = getReceiverSocketId(post.creator.toString());
+                if (receiverSocketId) {
+                    io.to(receiverSocketId).emit('notification', notification);
+                }
+            }
         }
-
         res.json(updatedPost)
-
     } catch (error) {
         return next(new HttpError(error))
     }

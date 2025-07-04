@@ -2,6 +2,7 @@ const HttpError = require('../models/errorModel')
 const ConversationModel = require('../models/conversationModel')
 const MessageModel = require('../models/messageModel')
 const {getReceiverSocketId, io} = require("../socket/socket");
+const Notification = require('../models/notificationModel');
 
 
 const createMessage = async (req, res, next) => {
@@ -30,6 +31,18 @@ const createMessage = async (req, res, next) => {
           io.to(receiverSocketId).emit('newMessage', newMessage)
         }
 
+        // Notify receiver if not self
+        if (receiverId !== req.user.id) {
+            const notification = await Notification.create({
+                recipient: receiverId,
+                sender: req.user.id,
+                type: 'message',
+                message: newMessage._id
+            });
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('notification', notification);
+            }
+        }
 
         res.json(newMessage)
 

@@ -55,6 +55,21 @@ class SocketService {
                 this.notifyListeners('test', data);
             });
 
+            // Listen for notification events
+            this.socket.on('notification', (notification) => {
+                this.notifyListeners('notification', notification);
+                // Browser push notification
+                if (window.Notification && Notification.permission === 'granted') {
+                    let body = '';
+                    if (notification.type === 'like') body = 'Someone liked your post.';
+                    else if (notification.type === 'comment') body = 'Someone commented on your post.';
+                    else if (notification.type === 'follow') body = 'Someone followed you.';
+                    else if (notification.type === 'message') body = 'New message received.';
+                    else if (notification.type === 'admin') body = 'Admin notification.';
+                    new Notification('Linkly', { body });
+                }
+            });
+
         } catch (error) {
             this.notifyListeners('connection', { connected: false, error });
         }

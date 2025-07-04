@@ -25,6 +25,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { userActions } from './redux/user-slice.js';
 import { useEffect } from 'react';
 import socketService from './services/socketService.js';
+import { notificationActions } from './redux/notification-slice.js';
+import axios from 'axios';
 
 const router = createBrowserRouter([
     {
@@ -62,26 +64,37 @@ const SocketManager = () => {
     const currentUser = useSelector((state) => state.user.currentUser);
 
     useEffect(() => {
-        // Check for user ID in different possible fields
         const userId = currentUser?.id || currentUser?._id;
-        
-        if (userId && currentUser?.token) {
-            // Test if backend is reachable first
+        const token = currentUser?.token;
+
+        // Fetch notifications on login
+        const fetchNotifications = async () => {
+            if (userId && token) {
+                dispatch(notificationActions.setLoading(true));
+                try {
+                    const response = await axios.get(`${import.meta.env.VITE_API_URL}/notifications`, {
+                        withCredentials: true,
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    dispatch(notificationActions.setNotifications(response.data));
+                } catch (err) {
+                    // Optionally handle error
+                } finally {
+                    dispatch(notificationActions.setLoading(false));
+                }
+            }
+        };
+        fetchNotifications();
+
+        if (userId && token) {
             (async () => {
                 try {
                     const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:6060';
                     const cleanUrl = socketUrl.replace(/\/$/, '').replace(/\/socket\.io.*$/, '').replace(/\/api.*$/, '');
-                    
-                    
-                    // Connect socket
                     socketService.connect(userId);
-                    
-                } catch (error) {
-                    // Backend not reachable, skip socket connection
-                }
+                } catch (error) {}
             })();
         } else {
-            // Disconnect socket if no user
             socketService.disconnect();
         }
 
@@ -89,28 +102,36 @@ const SocketManager = () => {
         const handleConnection = (data) => {
             dispatch(userActions.setSocketConnected(data.connected));
         };
-
         const handleOnlineUsers = (onlineUsers) => {
             dispatch(userActions.setOnlineUsers(onlineUsers));
         };
+        // Handle real-time notification
+        const handleNotification = (notification) => {
+            dispatch(notificationActions.addNotification(notification));
+        };
 
-        // Add listeners
         socketService.on('connection', handleConnection);
         socketService.on('onlineUsers', handleOnlineUsers);
+        socketService.on('notification', handleNotification);
 
-        // Cleanup on unmount or user change
         return () => {
             socketService.off('connection', handleConnection);
             socketService.off('onlineUsers', handleOnlineUsers);
+            socketService.off('notification', handleNotification);
             socketService.disconnect();
             dispatch(userActions.setSocketConnected(false));
         };
     }, [currentUser?.id, currentUser?._id, currentUser?.token, dispatch]);
 
-    return null; // This component doesn't render anything
+    return null;
 };
 
 const App = () => {
+    useEffect(() => {
+        if (window.Notification && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }, []);
     return (
         <Provider store={store}>
             <SocketManager />

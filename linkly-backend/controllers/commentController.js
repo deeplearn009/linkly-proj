@@ -2,8 +2,8 @@ const HttpError = require('../models/errorModel')
 const CommentModel = require("../models/commentModel");
 const PostModel = require("../models/postModel");
 const UserModel = require("../models/userModel");
-
-
+const Notification = require('../models/notificationModel');
+const { io, getReceiverSocketId } = require('../socket/socket');
 
 const createComment = async (req, res, next) => {
     try {
@@ -18,6 +18,22 @@ const createComment = async (req, res, next) => {
         const commentCreator = await UserModel.findById(req.user.id)
         const newComment = await CommentModel.create({creator: {creatorId: req.user.id, creatorName: commentCreator?.fullName, creatorPhoto: commentCreator?.profilePhoto}, comment, postId})
         await PostModel.findByIdAndUpdate(postId, {$push: {comments: newComment?._id}}, {new: true})
+
+        // Notify post creator if not self
+        const post = await PostModel.findById(postId)
+        if (post && post.creator.toString() !== req.user.id) {
+            const notification = await Notification.create({
+                recipient: post.creator,
+                sender: req.user.id,
+                type: 'comment',
+                post: post._id,
+                comment: newComment._id
+            });
+            const receiverSocketId = getReceiverSocketId(post.creator.toString());
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('notification', notification);
+            }
+        }
 
         res.json(newComment)
 

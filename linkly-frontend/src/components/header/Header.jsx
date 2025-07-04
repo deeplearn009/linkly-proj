@@ -7,8 +7,9 @@ import {useSelector, useDispatch} from "react-redux";
 import { motion, AnimatePresence } from 'framer-motion';
 import {uiSliceActions} from "../../redux/ui-slice";
 import axios from "axios";
-import { FaSearch, FaHome, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaSearch, FaHome, FaUser, FaSignOutAlt, FaBell } from 'react-icons/fa';
 import { userActions } from '../../redux/user-slice';
+import { notificationActions } from '../../redux/notification-slice';
 
 const Header = () => {
     const userId = useSelector(state => state?.user?.currentUser?.id);
@@ -21,6 +22,10 @@ const Header = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const searchRef = useRef(null);
+    const notifications = useSelector(state => state.notification.notifications);
+    const unreadCount = useSelector(state => state.notification.unreadCount);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const notificationRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -29,6 +34,16 @@ const Header = () => {
             }
         };
 
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                setShowNotifications(false);
+            }
+        };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
@@ -90,6 +105,39 @@ const Header = () => {
                 duration: 0.3
             }
         })
+    };
+
+    const handleNotificationClick = async (notification) => {
+        if (!notification.isRead) {
+            try {
+                await axios.patch(`${import.meta.env.VITE_API_URL}/notifications/${notification._id}/read`, {}, {
+                    withCredentials: true,
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                dispatch(notificationActions.markAsRead(notification._id));
+            } catch (err) {}
+        }
+        if ((notification.type === 'like' || notification.type === 'comment') && notification.post) {
+            const postId = typeof notification.post === 'string' ? notification.post : notification.post._id;
+            if (postId) navigate(`/posts/${postId}`);
+        } else if (notification.type === 'follow' && notification.sender) {
+            const senderId = typeof notification.sender === 'string' ? notification.sender : notification.sender._id;
+            if (senderId) navigate(`/users/${senderId}`);
+        } else if (notification.type === 'message' && notification.sender) {
+            const senderId = typeof notification.sender === 'string' ? notification.sender : notification.sender._id;
+            if (senderId) navigate(`/messages/${senderId}`);
+        }
+        setShowNotifications(false);
+    };
+
+    const handleMarkAllAsRead = async () => {
+        try {
+            await axios.patch(`${import.meta.env.VITE_API_URL}/notifications/read-all`, {}, {
+                withCredentials: true,
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            dispatch(notificationActions.markAllAsRead());
+        } catch (err) {}
     };
 
     return (
@@ -175,6 +223,77 @@ const Header = () => {
                             Login
                         </Link>
                     )}
+                    <div className="navbar__notification" ref={notificationRef} style={{ position: 'relative' }}>
+                        <button className="navbar__action" onClick={() => setShowNotifications(v => !v)} aria-label="Notifications">
+                            <FaBell />
+                            {unreadCount > 0 && (
+                                <span style={{
+                                    position: 'absolute',
+                                    top: '-6px',
+                                    right: '-6px',
+                                    background: 'red',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                    fontSize: '0.7rem',
+                                    padding: '2px 6px',
+                                    zIndex: 2
+                                }}>{unreadCount}</span>
+                            )}
+                        </button>
+                        <AnimatePresence>
+                            {showNotifications && (
+                                <motion.div
+                                    className="notification-dropdown"
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    style={{
+                                        position: 'absolute',
+                                        right: 0,
+                                        top: '2.5rem',
+                                        background: 'white',
+                                        border: '1px solid #eee',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                        minWidth: '320px',
+                                        maxHeight: '400px',
+                                        overflowY: 'auto',
+                                        zIndex: 1000
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>
+                                        <span>Notifications</span>
+                                        {unreadCount > 0 && (
+                                            <button onClick={handleMarkAllAsRead} style={{ fontSize: '0.9rem', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer' }}>Mark all as read</button>
+                                        )}
+                                    </div>
+                                    {notifications.length === 0 ? (
+                                        <div style={{ padding: '1rem', color: '#888' }}>No notifications</div>
+                                    ) : (
+                                        notifications.slice(0, 10).map(n => (
+                                            <div
+                                                key={n._id}
+                                                style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f5f5f5', background: n.isRead ? '#fff' : '#e6f7ff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                                                onClick={() => handleNotificationClick(n)}
+                                            >
+                                                {n.sender && <ProfileImage image={n.sender.profilePhoto} style={{ width: 32, height: 32 }} />}
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ fontWeight: n.isRead ? 'normal' : 'bold', fontSize: '0.97rem' }}>
+                                                        {n.type === 'like' && <span><b>{n.sender?.fullName || 'Someone'}</b> liked your post.</span>}
+                                                        {n.type === 'comment' && <span><b>{n.sender?.fullName || 'Someone'}</b> commented on your post.</span>}
+                                                        {n.type === 'follow' && <span><b>{n.sender?.fullName || 'Someone'}</b> followed you.</span>}
+                                                        {n.type === 'message' && <span><b>{n.sender?.fullName || 'Someone'}</b> sent you a message.</span>}
+                                                        {n.type === 'admin' && <span>Admin notification.</span>}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#888' }}>{new Date(n.createdAt).toLocaleString()}</div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </motion.div>
             </div>
         </motion.nav>

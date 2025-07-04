@@ -35,6 +35,8 @@ const {createComment, getPostComments, deleteComment} = require('../controllers/
 
 const {getConversations, getMessages, createMessage} = require('../controllers/messageController')
 
+const notificationController = require('../controllers/notificationController')
+
 
 // User routes
 
@@ -75,6 +77,13 @@ router.delete('/comments/:commentId', authMiddleware, deleteComment)
 router.post('/messages/:receiverId', authMiddleware, createMessage)
 router.get('/messages/:receiverId', authMiddleware, getMessages)
 router.get('/conversations', authMiddleware, getConversations)
+
+
+// Notification routes
+router.get('/notifications', authMiddleware, notificationController.getNotifications)
+router.patch('/notifications/:id/read', authMiddleware, notificationController.markAsRead)
+router.patch('/notifications/read-all', authMiddleware, notificationController.markAllAsRead)
+router.delete('/notifications/:id', authMiddleware, notificationController.deleteNotification)
 
 module.exports = router
 
