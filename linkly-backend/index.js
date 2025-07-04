@@ -13,11 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const allowedOrigins = [
-  "https://linkly-proj-7jtf.vercel.app", // frontend
-  "https://linkly-proj.vercel.app",      // backend (optional, for testing)
   "http://localhost:5173",
-  "linkly-proj.onrender.com",
-  "https://warm-begonia-fe513d.netlify.app"               // local dev (optional)
+  // "linkly-proj.onrender.com",
+  "https://warm-begonia-fe513d.netlify.app"
 ];
 
 app.use(cors({
