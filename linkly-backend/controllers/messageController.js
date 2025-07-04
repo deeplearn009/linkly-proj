@@ -93,5 +93,49 @@ const getConversations = async (req, res, next) => {
     }
 }
 
+const deleteConversation = async (req, res, next) => {
+    try {
+        const { conversationId } = req.params;
+        
+        // Find the conversation and verify the user is a participant
+        const conversation = await ConversationModel.findOne({
+            _id: conversationId,
+            participants: req.user.id
+        });
 
-module.exports = {getConversations, getMessages, createMessage}
+        if (!conversation) {
+            return next(new HttpError("Conversation not found or you don't have permission to delete it.", 404));
+        }
+
+        // Start a session for transaction
+        const session = await ConversationModel.startSession();
+        session.startTransaction();
+
+        try {
+            // Delete all messages in the conversation
+            await MessageModel.deleteMany({ conversationId: conversationId }, { session });
+            
+            // Delete the conversation
+            await ConversationModel.findByIdAndDelete(conversationId, { session });
+
+            // Commit the transaction
+            await session.commitTransaction();
+            
+            res.json({ message: 'Conversation deleted successfully' });
+
+        } catch (error) {
+            // Rollback the transaction on error
+            await session.abortTransaction();
+            throw error;
+        } finally {
+            // End the session
+            session.endSession();
+        }
+
+    } catch (err) {
+        console.error('Error deleting conversation:', err);
+        return next(new HttpError('Error deleting conversation', 500));
+    }
+}
+
+module.exports = {getConversations, getMessages, createMessage, deleteConversation}

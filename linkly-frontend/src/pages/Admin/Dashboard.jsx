@@ -1,37 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Card, Row, Col, Statistic, List, Avatar, Typography, Spin, Tag, Progress, Alert } from 'antd';
-import { UserOutlined, CommentOutlined, FileTextOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import TimeAgo from 'react-timeago';
-import { Column } from '@ant-design/plots';
-
-const { Title } = Typography;
+import { motion } from 'framer-motion';
+import { FaUsers, FaComments, FaFileAlt, FaChartLine, FaClock, FaUserPlus, FaComment, FaFileAlt as FaPost } from 'react-icons/fa';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({});
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
+  const [activitiesError, setActivitiesError] = useState(null);
   const currentUser = useSelector(state => state.user.currentUser);
-  const isAdmin = useSelector(state => state.user.isAdmin);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is admin
-    if (!currentUser || !isAdmin) {
-      navigate('/login');
-      return;
-    }
     fetchStats();
     fetchRecentActivities();
-  }, [currentUser, isAdmin, navigate]);
+  }, []);
 
   const fetchStats = async () => {
     try {
-      setError(null);
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/stats`, {
         headers: {
           Authorization: `Bearer ${currentUser.token}`
@@ -39,376 +26,173 @@ const Dashboard = () => {
       });
       setStats(response.data);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch dashboard statistics';
-      toast.error(errorMessage);
-      setError(errorMessage);
       console.error('Error fetching stats:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const fetchRecentActivities = async () => {
+    setActivitiesLoading(true);
+    setActivitiesError(null);
     try {
-      const [usersResponse, postsResponse, commentsResponse] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API_URL}/admin/users?limit=5`, {
-          headers: { Authorization: `Bearer ${currentUser.token}` }
-        }),
-        axios.get(`${import.meta.env.VITE_API_URL}/admin/posts?limit=5`, {
-          headers: { Authorization: `Bearer ${currentUser.token}` }
-        }),
-        axios.get(`${import.meta.env.VITE_API_URL}/admin/comments?limit=5`, {
-          headers: { Authorization: `Bearer ${currentUser.token}` }
-        })
-      ]);
-
-      const activities = [
-        ...usersResponse.data.map(user => ({
-          type: 'user',
-          data: user,
-          timestamp: user.createdAt
-        })),
-        ...postsResponse.data.map(post => ({
-          type: 'post',
-          data: post,
-          timestamp: post.createdAt
-        })),
-        ...commentsResponse.data.map(comment => ({
-          type: 'comment',
-          data: comment,
-          timestamp: comment.createdAt
-        }))
-      ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-       .slice(0, 10);
-
-      setRecentActivities(activities);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/recent-activities`, {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`
+        }
+      });
+      setRecentActivities(response.data);
     } catch (error) {
-      toast.error('Failed to fetch recent activities');
-      console.error('Error fetching activities:', error);
+      console.error('Error fetching recent activities:', error);
+      setActivitiesError('Failed to load recent activities');
+    } finally {
+      setActivitiesLoading(false);
+      setLoading(false);
     }
   };
 
   const getActivityIcon = (type) => {
     switch (type) {
-      case 'user':
-        return <UserOutlined style={{ color: '#1890ff' }} />;
-      case 'post':
-        return <FileTextOutlined style={{ color: '#52c41a' }} />;
+      case 'user_registration':
+        return <FaUserPlus />;
       case 'comment':
-        return <CommentOutlined style={{ color: '#722ed1' }} />;
+        return <FaComment />;
+      case 'post':
+        return <FaPost />;
       default:
-        return null;
+        return <FaClock />;
     }
   };
 
   const getActivityTitle = (activity) => {
     switch (activity.type) {
-      case 'user':
-        return `New user registered: ${activity.data.fullName}`;
-      case 'post':
-        return `New post created: ${activity.data.body.substring(0, 50)}${activity.data.body.length > 50 ? '...' : ''}`;
+      case 'user_registration':
+        return `${activity.userName} joined the platform`;
       case 'comment':
-        return `New comment on post: ${activity.data.comment.substring(0, 50)}${activity.data.comment.length > 50 ? '...' : ''}`;
+        return `${activity.userName} commented on a post`;
+      case 'post':
+        return `${activity.userName} created a new post`;
       default:
-        return '';
+        return 'Activity occurred';
     }
   };
 
-  const getChartData = () => {
-    if (!stats) return [];
-    return [
-      { type: 'Users', count: stats.totalUsers, color: '#1890ff' },
-      { type: 'Posts', count: stats.totalPosts, color: '#52c41a' },
-      { type: 'Comments', count: stats.totalComments, color: '#722ed1' }
-    ];
-  };
-
-  const chartConfig = {
-    data: [
-      { type: 'Users', count: stats?.totalUsers || 0 },
-      { type: 'Posts', count: stats?.totalPosts || 0 },
-      { type: 'Comments', count: stats?.totalComments || 0 },
-    ],
-    xField: 'type',
-    yField: 'count',
-    label: {
-      position: 'middle',
-      style: {
-        fill: '#FFFFFF',
-        opacity: 0.6,
-      },
+  const statsCards = [
+    {
+      title: 'Total Users',
+      value: stats.totalUsers || 0,
+      icon: <FaUsers />,
+      color: '#3b82f6'
     },
-    meta: {
-      type: { alias: 'Category' },
-      count: { alias: 'Count' },
+    {
+      title: 'Total Posts',
+      value: stats.totalPosts || 0,
+      icon: <FaFileAlt />,
+      color: '#10b981'
     },
-    color: ['#1890ff', '#52c41a', '#722ed1'],
-    columnStyle: {
-      radius: [4, 4, 0, 0],
+    {
+      title: 'Total Comments',
+      value: stats.totalComments || 0,
+      icon: <FaComments />,
+      color: '#f59e0b'
     },
-    height: window.innerWidth < 768 ? 200 : 300,
-    autoFit: true,
-    padding: 'auto',
-  };
-
-  const getMaxValue = () => {
-    if (!stats) return 100;
-    return Math.max(stats.totalUsers, stats.totalPosts, stats.totalComments);
-  };
-
-  if (!currentUser || !isAdmin) {
-    return null; // Will redirect in useEffect
-  }
+    {
+      title: 'Active Users',
+      value: stats.activeUsers || 0,
+      icon: <FaChartLine />,
+      color: '#8b5cf6'
+    }
+  ];
 
   if (loading) {
     return (
-      <div className="admin-container" style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" />
+      <div className="admin-loading">
+        <div className="admin-spinner"></div>
+        <p>Loading dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="admin-container" style={{ padding: '16px' }}>
-      <Title level={2} style={{ 
-        marginBottom: '24px',
-        fontSize: window.innerWidth < 768 ? '1.5rem' : '2rem',
-        textAlign: 'center'
-      }}>
-        Dashboard
-      </Title>
+    <div className="admin-container">
+      <h2 className="admin-title">Admin Dashboard</h2>
       
-      {error && (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          style={{ marginBottom: '24px' }}
-        />
-      )}
-      
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={8}>
-          <Card bodyStyle={{ padding: '12px' }}>
-            <div style={{ 
-              textAlign: 'center', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              height: window.innerWidth < 768 ? '140px' : '180px'
-            }}>
-              <Progress
-                type="circle"
-                percent={Math.round((stats?.totalUsers / getMaxValue()) * 100)}
-                format={() => (
-                  <div style={{ 
-                    width: window.innerWidth < 768 ? '80px' : '100px',
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)'
-                  }}>
-                    <UserOutlined style={{ 
-                      fontSize: window.innerWidth < 768 ? '16px' : '20px',
-                      color: '#1890ff' 
-                    }} />
-                    <div style={{ 
-                      fontSize: window.innerWidth < 768 ? '16px' : '20px',
-                      fontWeight: 'bold', 
-                      marginTop: '4px' 
-                    }}>
-                      {stats?.totalUsers}
-                    </div>
-                    <div style={{ 
-                      color: '#666', 
-                      fontSize: window.innerWidth < 768 ? '10px' : '12px',
-                      marginTop: '2px' 
-                    }}>
-                      Users
-                    </div>
-                  </div>
-                )}
-                strokeColor="#1890ff"
-                size={window.innerWidth < 768 ? 120 : 140}
-                strokeWidth={10}
-              />
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <Card bodyStyle={{ padding: '12px' }}>
-            <div style={{ 
-              textAlign: 'center', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              height: window.innerWidth < 768 ? '140px' : '180px'
-            }}>
-              <Progress
-                type="circle"
-                percent={Math.round((stats?.totalPosts / getMaxValue()) * 100)}
-                format={() => (
-                  <div style={{ 
-                    width: window.innerWidth < 768 ? '80px' : '100px',
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)'
-                  }}>
-                    <FileTextOutlined style={{ 
-                      fontSize: window.innerWidth < 768 ? '16px' : '20px',
-                      color: '#52c41a' 
-                    }} />
-                    <div style={{ 
-                      fontSize: window.innerWidth < 768 ? '16px' : '20px',
-                      fontWeight: 'bold', 
-                      marginTop: '4px' 
-                    }}>
-                      {stats?.totalPosts}
-                    </div>
-                    <div style={{ 
-                      color: '#666', 
-                      fontSize: window.innerWidth < 768 ? '10px' : '12px',
-                      marginTop: '2px' 
-                    }}>
-                      Posts
-                    </div>
-                  </div>
-                )}
-                strokeColor="#52c41a"
-                size={window.innerWidth < 768 ? 120 : 140}
-                strokeWidth={10}
-              />
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <Card bodyStyle={{ padding: '12px' }}>
-            <div style={{ 
-              textAlign: 'center', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center', 
-              height: window.innerWidth < 768 ? '140px' : '180px'
-            }}>
-              <Progress
-                type="circle"
-                percent={Math.round((stats?.totalComments / getMaxValue()) * 100)}
-                format={() => (
-                  <div style={{ 
-                    width: window.innerWidth < 768 ? '80px' : '100px',
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)'
-                  }}>
-                    <CommentOutlined style={{ 
-                      fontSize: window.innerWidth < 768 ? '16px' : '20px',
-                      color: '#722ed1' 
-                    }} />
-                    <div style={{ 
-                      fontSize: window.innerWidth < 768 ? '16px' : '20px',
-                      fontWeight: 'bold', 
-                      marginTop: '4px' 
-                    }}>
-                      {stats?.totalComments}
-                    </div>
-                    <div style={{ 
-                      color: '#666', 
-                      fontSize: window.innerWidth < 768 ? '10px' : '12px',
-                      marginTop: '2px' 
-                    }}>
-                      Comments
-                    </div>
-                  </div>
-                )}
-                strokeColor="#722ed1"
-                size={window.innerWidth < 768 ? 120 : 140}
-                strokeWidth={10}
-              />
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col span={24}>
-          <Card 
-            title="Statistics Overview" 
-            bodyStyle={{ padding: '12px' }}
-            headStyle={{ 
-              padding: '12px 24px',
-              fontSize: window.innerWidth < 768 ? '14px' : '16px'
-            }}
+      {/* Stats Cards */}
+      <div className="admin-stats-grid">
+        {statsCards.map((card, index) => (
+          <motion.div
+            key={card.title}
+            className="admin-stats-card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            style={{ borderLeft: `4px solid ${card.color}` }}
           >
-            <div style={{ overflowX: 'auto' }}>
-              <Column {...chartConfig} />
+            <div className="stats-card-header">
+              <div className="stats-card-icon" style={{ color: card.color }}>
+                {card.icon}
+              </div>
+              <div className="stats-card-content">
+                <h3 className="stats-card-title">{card.title}</h3>
+                <p className="stats-card-value">{card.value.toLocaleString()}</p>
+              </div>
             </div>
-          </Card>
-        </Col>
-      </Row>
+          </motion.div>
+        ))}
+      </div>
 
-      <Card 
-        title="Recent Activity" 
-        style={{ marginTop: '24px' }}
-        headStyle={{ 
-          padding: '12px 24px',
-          fontSize: window.innerWidth < 768 ? '14px' : '16px'
-        }}
-      >
-        <List
-          itemLayout="horizontal"
-          dataSource={recentActivities}
-          renderItem={activity => (
-            <List.Item style={{ padding: '8px 0' }}>
-              <List.Item.Meta
-                avatar={getActivityIcon(activity.type)}
-                title={
-                  <div style={{ 
-                    fontSize: window.innerWidth < 768 ? '12px' : '14px',
-                    wordBreak: 'break-word',
-                    whiteSpace: 'normal',
-                    lineHeight: '1.4'
-                  }}>
-                    {getActivityTitle(activity)}
-                  </div>
-                }
-                description={
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px',
-                    flexWrap: 'wrap',
-                    marginTop: '4px'
-                  }}>
-                    <Tag color={
-                      activity.type === 'user' ? 'blue' :
-                      activity.type === 'post' ? 'green' :
-                      'purple'
-                    }>
-                      {activity.type.toUpperCase()}
-                    </Tag>
-                    <TimeAgo date={activity.timestamp} />
-                  </div>
-                }
-              />
-            </List.Item>
+      {/* Recent Activities */}
+      <div className="admin-activities-section">
+        <h3 className="section-title">Recent Activities</h3>
+        <div className="activities-list">
+          {activitiesLoading ? (
+            <div className="no-activities">
+              <div className="admin-spinner"></div>
+              <p>Loading activities...</p>
+            </div>
+          ) : activitiesError ? (
+            <div className="no-activities">
+              <p style={{ color: '#ef4444' }}>{activitiesError}</p>
+              <button 
+                onClick={fetchRecentActivities}
+                style={{
+                  background: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  marginTop: '0.5rem'
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          ) : recentActivities.length > 0 ? (
+            recentActivities.map((activity, index) => (
+              <motion.div
+                key={activity._id || index}
+                className="activity-item"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <div className="activity-icon">
+                  {getActivityIcon(activity.type)}
+                </div>
+                <div className="activity-content">
+                  <p className="activity-title">{getActivityTitle(activity)}</p>
+                  <small className="activity-time">
+                    {new Date(activity.createdAt).toLocaleString()}
+                  </small>
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="no-activities">
+              <p>No recent activities</p>
+            </div>
           )}
-        />
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

@@ -144,18 +144,22 @@ const UserProfile = () => {
                 {/* Avatar and Remove Button Column */}
                 <div className="profile__avatar-row">
                   <div className="profile__avatar-container">
-                    <form className="profile__image" onSubmit={changeAvatarHandler} encType="multipart/form-data">
+                    <div className="profile__image">
                       <img src={user?.profilePhoto} alt="" />
-                      {avatar instanceof File ? (
-                        <button type="submit" className="profile__image-btn profile__image-btn--check"><FaCheck /></button>
-                      ) : (
-                        <label htmlFor="avatar" className="profile__image-edit">
-                          <span><LuUpload /></span>
-                        </label>
+                      {user?._id === loggedInUserId && (
+                        <form onSubmit={changeAvatarHandler} encType="multipart/form-data">
+                          {avatar instanceof File ? (
+                            <button type="submit" className="profile__image-btn profile__image-btn--check"><FaCheck /></button>
+                          ) : (
+                            <label htmlFor="avatar" className="profile__image-edit">
+                              <span><LuUpload /></span>
+                            </label>
+                          )}
+                          <input type="file" name="avatar" id="avatar" onChange={e => {setAvatar(e.target.files[0]); setAvatarTouched(true)}} accept=".png, .jpg, .jpeg, .img" style={{ display: 'none' }} />
+                        </form>
                       )}
-                      <input type="file" name="avatar" id="avatar" onChange={e => {setAvatar(e.target.files[0]); setAvatarTouched(true)}} accept=".png, .jpg, .jpeg, .img" style={{ display: 'none' }} />
-                    </form>
-                    {user?.profilePhoto && user?.profilePhoto !== DEFAULT_AVATAR && (
+                    </div>
+                    {user?._id === loggedInUserId && user?.profilePhoto && user?.profilePhoto !== DEFAULT_AVATAR && (
                       <button
                         type="button"
                         className="profile__remove-btn"

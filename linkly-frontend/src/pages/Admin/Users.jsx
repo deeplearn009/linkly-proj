@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Table, Button, Space, Modal, Select, message, Spin, Tag, Typography } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-
-const { Option } = Select;
-const { Title, Text } = Typography;
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaTrash, FaEdit, FaEye, FaUser, FaUserShield } from 'react-icons/fa';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const currentUser = useSelector(state => state.user.currentUser);
 
   useEffect(() => {
@@ -35,18 +35,39 @@ const Users = () => {
     }
   };
 
-  const handleDelete = async (userId) => {
+  const showDeleteConfirmModal = async (user) => {
+    setDeletingUser(user);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingUser) return;
+    
+    setDeleteLoading(true);
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/admin/users/${userId}`, {
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/admin/users/${deletingUser._id}`, {
         headers: {
           Authorization: `Bearer ${currentUser.token}`
         }
       });
-      toast.success('User deleted successfully');
+      
+      const { deletedData } = response.data;
+      toast.success(
+        `User deleted successfully! Removed: ${deletedData.posts} posts, ${deletedData.conversations} conversations, ${deletedData.followers} followers, ${deletedData.following} following`,
+        { duration: 5000 }
+      );
       fetchUsers();
     } catch (error) {
-      toast.error('Failed to delete user');
+      if (error.response?.status === 400) {
+        toast.error(error.response.data.message || 'Cannot delete this user');
+      } else {
+        toast.error('Failed to delete user');
+      }
       console.error('Error deleting user:', error);
+    } finally {
+      setDeleteLoading(false);
+      setShowDeleteConfirm(false);
+      setDeletingUser(null);
     }
   };
 
@@ -78,128 +99,168 @@ const Users = () => {
     }
   };
 
-  const columns = [
-    {
-      title: 'Full Name',
-      dataIndex: 'fullName',
-      key: 'fullName',
-      width: '25%',
-      render: (text) => (
-        <Text ellipsis={{ tooltip: text }} style={{ maxWidth: 200 }}>
-          {text}
-        </Text>
-      ),
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-      width: '30%',
-      render: (text) => (
-        <Text ellipsis={{ tooltip: text }} style={{ maxWidth: 250 }}>
-          {text}
-        </Text>
-      ),
-    },
-    {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
-      width: '15%',
-      render: (role) => (
-        <Tag color={role === 'admin' ? 'red' : 'blue'}>
-          {role.toUpperCase()}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: '20%',
-      render: (date) => new Date(date).toLocaleString(),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      width: '20%',
-      render: (_, record) => (
-        <Space size="small" wrap>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-            size={window.innerWidth < 768 ? 'small' : 'middle'}
-          >
-            {window.innerWidth < 768 ? '' : 'Edit'}
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record._id)}
-            size={window.innerWidth < 768 ? 'small' : 'middle'}
-          >
-            {window.innerWidth < 768 ? '' : 'Delete'}
-          </Button>
-        </Space>
-      ),
-    },
-  ];
-
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" />
+      <div className="admin-loading">
+        <div className="admin-spinner"></div>
+        <p>Loading users...</p>
       </div>
     );
   }
 
   return (
-    <div className="admin-container" style={{ padding: '16px' }}>
-      <Title level={2} style={{ 
-        marginBottom: '24px',
-        fontSize: window.innerWidth < 768 ? '1.5rem' : '2rem',
-        textAlign: 'center'
-      }}>
-        User Management
-      </Title>
-      <Table
-        columns={columns}
-        dataSource={users}
-        rowKey="_id"
-        pagination={{ 
-          pageSize: 10,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} users`
-        }}
-        scroll={{ x: 'max-content' }}
-        size={window.innerWidth < 768 ? 'small' : 'middle'}
-      />
-
-      <Modal
-        title="Edit User"
-        open={isModalVisible}
-        onOk={handleUpdate}
-        onCancel={() => setIsModalVisible(false)}
-        width={window.innerWidth < 768 ? '90%' : '500px'}
-      >
-        {editingUser && (
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <div>
-              <label>Role:</label>
-              <Select
-                value={editingUser.role}
-                onChange={(value) => setEditingUser({ ...editingUser, role: value })}
-                style={{ width: '100%' }}
-                size={window.innerWidth < 768 ? 'small' : 'middle'}
+    <div className="admin-container">
+      <h2 className="admin-title">User Management</h2>
+      
+      <div className="admin-warning">
+        <p><strong>Warning:</strong> Deleting a user will permanently remove all their data including posts, comments, conversations, and other related content. This action cannot be undone.</p>
+      </div>
+      
+      <div className="admin-table-container">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <motion.tr 
+                key={user._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className={user._id === currentUser.id ? 'current-user' : ''}
               >
-                <Option value="user">User</Option>
-                <Option value="admin">Admin</Option>
-              </Select>
-            </div>
-          </Space>
+                <td>
+                  <div className="user-info">
+                    <span className="user-name">{user.fullName}</span>
+                    {user._id === currentUser.id && (
+                      <span className="current-user-badge">You</span>
+                    )}
+                  </div>
+                </td>
+                <td className="user-email">{user.email}</td>
+                <td>
+                  <span className={`role-badge ${user.role}`}>
+                    {user.role === 'admin' ? <FaUserShield /> : <FaUser />}
+                    {user.role.toUpperCase()}
+                  </span>
+                </td>
+                <td>{new Date(user.createdAt).toLocaleString()}</td>
+                <td>
+                  <div className="action-buttons">
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleEdit(user)}
+                      disabled={deleteLoading}
+                      title="Edit user"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => showDeleteConfirmModal(user)}
+                      disabled={deleteLoading || user._id === currentUser.id}
+                      title={user._id === currentUser.id ? "Cannot delete your own account" : "Delete user"}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Edit User Modal */}
+      <AnimatePresence>
+        {isModalVisible && (
+          <div className="modal-overlay" onClick={() => setIsModalVisible(false)}>
+            <motion.div 
+              className="modal-content"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3>Edit User</h3>
+              {editingUser && (
+                <div className="edit-form">
+                  <div className="form-group">
+                    <label>Role:</label>
+                    <select
+                      value={editingUser.role}
+                      onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+                    >
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                  <div className="modal-actions">
+                    <button className="btn-cancel" onClick={() => setIsModalVisible(false)}>
+                      Cancel
+                    </button>
+                    <button className="btn-save" onClick={handleUpdate}>
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
         )}
-      </Modal>
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <div className="modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
+            <motion.div 
+              className="modal-content delete-modal"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3>Delete User</h3>
+              <p>Are you sure you want to delete <strong>{deletingUser?.fullName}</strong>?</p>
+              <p>This action will permanently delete:</p>
+              <ul>
+                <li>All posts by {deletingUser?.fullName}</li>
+                <li>All comments by {deletingUser?.fullName}</li>
+                <li>All conversations and messages</li>
+                <li>All notifications</li>
+                <li>All stories</li>
+                <li>User's profile and account data</li>
+                <li>All references in other users' data</li>
+              </ul>
+              <p><strong>This action cannot be undone!</strong></p>
+              <div className="modal-actions">
+                <button 
+                  className="btn-cancel" 
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleteLoading}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="btn-delete-confirm" 
+                  onClick={handleDelete}
+                  disabled={deleteLoading}
+                >
+                  {deleteLoading ? 'Deleting...' : 'Delete User'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
