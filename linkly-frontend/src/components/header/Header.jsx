@@ -247,19 +247,6 @@ const Header = () => {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    style={{
-                                        position: 'absolute',
-                                        right: 0,
-                                        top: '2.5rem',
-                                        background: 'white',
-                                        border: '1px solid #eee',
-                                        borderRadius: '8px',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                        minWidth: '320px',
-                                        maxHeight: '400px',
-                                        overflowY: 'auto',
-                                        zIndex: 1000
-                                    }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>
                                         <span>Notifications</span>
@@ -273,7 +260,8 @@ const Header = () => {
                                         notifications.slice(0, 10).map(n => (
                                             <div
                                                 key={n._id}
-                                                style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f5f5f5', background: n.isRead ? '#fff' : '#e6f7ff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+                                                className={`notification-item${n.isRead ? '' : ' unread'}`}
+                                                style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #f5f5f5', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, background: n.isRead ? undefined : undefined }}
                                                 onClick={() => handleNotificationClick(n)}
                                             >
                                                 {n.sender && <ProfileImage image={n.sender.profilePhoto} style={{ width: 32, height: 32 }} />}
