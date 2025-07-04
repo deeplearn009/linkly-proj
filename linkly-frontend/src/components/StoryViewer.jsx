@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProfileImage from './ProfileImage';
 import { FaTrash, FaEye } from 'react-icons/fa';
+import StoryUploader from './StoryUploader';
 
 const StoryViewer = ({ user, onClose }) => {
   const [stories, setStories] = useState([]);
@@ -11,6 +12,7 @@ const StoryViewer = ({ user, onClose }) => {
   const [showViewers, setShowViewers] = useState(false);
   const [viewers, setViewers] = useState([]);
   const [isLoadingViewers, setIsLoadingViewers] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
   const token = useSelector(state => state.user.currentUser?.token);
   const currentUserId = useSelector(state => state.user.currentUser?.id);
   const timerRef = useRef();
@@ -110,6 +112,16 @@ const StoryViewer = ({ user, onClose }) => {
     setIsLoadingViewers(false);
   };
 
+  // When upload is successful, close uploader and refresh stories
+  const handleUploadSuccess = () => {
+    setShowUploader(false);
+    fetchUserStories();
+    if (window && window.dispatchEvent) {
+      // Notify StoriesBar to refresh (optional, if needed)
+      window.dispatchEvent(new Event('stories:refresh'));
+    }
+  };
+
   if (!stories.length) return null;
 
   return (
@@ -127,6 +139,16 @@ const StoryViewer = ({ user, onClose }) => {
           <ProfileImage image={user.profilePhoto} />
           <span style={{ color: 'white', fontWeight: 600 }}>{user.fullName}</span>
           <button onClick={onClose} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#fff', fontSize: 22, cursor: 'pointer' }}>&times;</button>
+          {/* Add Story + button for own stories */}
+          {user._id === currentUserId && (
+            <button
+              title="Add Story"
+              onClick={() => setShowUploader(true)}
+              style={{ marginLeft: 12, background: '#2563eb', color: '#fff', border: 'none', borderRadius: '50%', width: 36, height: 36, fontSize: 24, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              +
+            </button>
+          )}
         </div>
         {/* Story content */}
         <div style={{ width: '100%', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
@@ -191,6 +213,10 @@ const StoryViewer = ({ user, onClose }) => {
               )}
             </div>
           </div>
+        )}
+        {/* StoryUploader modal inside StoryViewer */}
+        {showUploader && (
+          <StoryUploader onClose={() => setShowUploader(false)} onSuccess={handleUploadSuccess} />
         )}
       </div>
     </div>
