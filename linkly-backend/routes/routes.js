@@ -5,6 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware')
 const {
     registerUser,
     changeUserAvatar,
+    changeUserBanner,
     editUser,
     loginUser,
     getUser,
@@ -48,6 +49,7 @@ router.get('/users', authMiddleware, getUsers)
 router.patch('/users/:id', authMiddleware, editUser)
 router.get('/users/:id/follow-unfollow', authMiddleware, followUnfollowUser)
 router.post('/users/avatar', authMiddleware, changeUserAvatar)
+router.post('/users/banner', authMiddleware, changeUserBanner)
 router.get('/users/:id/posts', authMiddleware, getUserPosts)
 router.get('/users/:id/likes', authMiddleware, getUserLikedPosts)
 router.get('/users/:id/followers', authMiddleware, getFollowers)

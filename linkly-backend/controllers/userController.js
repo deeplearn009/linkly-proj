@@ -135,11 +135,22 @@ const getUsers = async (req, res, next) => {
 
 const editUser = async (req, res, next) => {
     try {
-        const {fullName, bio} = req.body;
+        const {
+            fullName,
+            bio,
+            profileBackground,
+            theme,
+            website,
+            location,
+            socialLinks
+        } = req.body;
+        const updateFields = { fullName, bio, profileBackground, theme, website, location };
+        if (socialLinks) updateFields.socialLinks = socialLinks;
+        // Remove undefined fields
+        Object.keys(updateFields).forEach(key => updateFields[key] === undefined && delete updateFields[key]);
         const editedUser = await UserModel.findByIdAndUpdate(req.user.id,
-            {fullName, bio}, {new: true})
+            updateFields, {new: true})
         res.json(editedUser).status(200)
-
     } catch (err) {
         return next(new HttpError(err));
     }
@@ -318,9 +329,37 @@ const searchUsers = async (req, res, next) => {
     }
 };
 
+// Upload banner image
+const changeUserBanner = async (req, res, next) => {
+    try {
+        if (!req.files || !req.files.banner) {
+            return next(new HttpError('Please choose an image', 422));
+        }
+        const {banner} = req.files;
+        let fileName = banner.name;
+        let splittedFileName = fileName.split('.');
+        let newFileName = splittedFileName[0] + uuid() + "." + splittedFileName[splittedFileName.length - 1];
+        banner.mv(path.join(__dirname, "..", "uploads", newFileName), async (err) => {
+            if (err) {
+                return next(new HttpError(err));
+            }
+            // store in cloudinary
+            const result = await cloudinary.uploader.upload(path.join(__dirname, "..", "uploads", newFileName), {resource_type: "image"})
+            if (!result.secure_url) {
+                return next(new HttpError("Cannot upload an image to cloudinary", 422));
+            }
+            const updatedUser = await UserModel.findByIdAndUpdate(req.user.id, {bannerImage: result?.secure_url}, {new: true})
+            res.json(updatedUser).status(200)
+        });
+    } catch (err) {
+        return next(new HttpError(err));
+    }
+}
+
 module.exports = {
     registerUser,
     changeUserAvatar,
+    changeUserBanner,
     editUser,
     loginUser,
     getUser,

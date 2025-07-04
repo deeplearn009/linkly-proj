@@ -3,7 +3,8 @@ import axios from "axios";
 import {useDispatch, useSelector} from "react-redux";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {LuUpload} from "react-icons/lu";
-import {FaCheck} from "react-icons/fa6";
+import {FaCheck, FaTwitter, FaFacebook, FaInstagram, FaLinkedin, FaGlobe} from "react-icons/fa6";
+import {FaMapMarkerAlt} from "react-icons/fa";
 import {userActions} from "../redux/user-slice.js";
 import {uiSliceActions} from "../redux/ui-slice.js";
 import FollowList from "./FollowList.jsx";
@@ -15,7 +16,7 @@ const UserProfile = () => {
     const token = useSelector(state => state?.user?.currentUser?.token)
     const loggedInUserId = useSelector(state => state?.user?.currentUser?.id)
     const currentUser = useSelector(state => state?.user?.currentUser)
-
+    const reduxUser = useSelector(state => state.user.currentUser);
 
     const [user, setUser] = useState({});
     const [followsUser, setFollowsUser] = useState(user?.followers?.includes(loggedInUserId));
@@ -111,6 +112,12 @@ const UserProfile = () => {
         getLikedPostsCount();
     }, [userId, followsUser, avatar])
 
+    // Sync with Redux user if viewing own profile
+    useEffect(() => {
+        if (userId === reduxUser?.id || userId === reduxUser?._id) {
+            setUser(reduxUser);
+        }
+    }, [reduxUser, userId]);
 
     return (
         <section className="profile">
@@ -146,6 +153,20 @@ const UserProfile = () => {
                 <article className="profile__bio">
                     <p>{user?.bio}</p>
                 </article>
+                <div className="profile__extra-info" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 12 }}>
+                    {user?.website && (
+                        <a href={user.website.startsWith('http') ? user.website : `https://${user.website}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FaGlobe /> {user.website}</a>
+                    )}
+                    {user?.location && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><FaMapMarkerAlt /> {user.location}</div>
+                    )}
+                    <div style={{ display: 'flex', gap: 10 }}>
+                        {user?.socialLinks?.twitter && <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer"><FaTwitter /></a>}
+                        {user?.socialLinks?.facebook && <a href={user.socialLinks.facebook} target="_blank" rel="noopener noreferrer"><FaFacebook /></a>}
+                        {user?.socialLinks?.instagram && <a href={user.socialLinks.instagram} target="_blank" rel="noopener noreferrer"><FaInstagram /></a>}
+                        {user?.socialLinks?.linkedin && <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer"><FaLinkedin /></a>}
+                    </div>
+                </div>
             </div>
             <AnimatePresence>
                 {showFollowList && (
